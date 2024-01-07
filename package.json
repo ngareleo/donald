@@ -2,15 +2,25 @@
   "name": "donald",
   "version": "1.0.50",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "db:dev": "bunx supabase start",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:login": "bunx supabase login --no-browser",
+    "db:migrate": "bunx supabase migration up",
+    "db:pull": "bunx supabase db pull",
+    "db:push": "bunx supabase db push",
+    "db:status": "bunx supabase status",
+    "dev": "bun run --watch src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "drizzle-orm": "^0.29.3",
     "elysia": "latest",
-    "prisma": "^5.7.1"
+    "postgres": "^3.4.3"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "drizzle-kit": "^0.20.10",
+    "supabase": "^1.127.4"
   },
   "module": "src/index.js"
 }
