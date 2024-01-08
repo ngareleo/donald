@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 	"username" text NOT NULL,
 	"email" text NOT NULL,
 	"phone_number" text NOT NULL,
-	"password" char(64) NOT NULL,
+	"password" text NOT NULL,
 	CONSTRAINT "user_username_unique" UNIQUE("username"),
 	CONSTRAINT "user_email_unique" UNIQUE("email"),
 	CONSTRAINT "user_phone_number_unique" UNIQUE("phone_number"),

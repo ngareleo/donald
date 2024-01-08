@@ -1,5 +1,5 @@
 {
-  "id": "b4747868-ea1b-4658-8508-1577a80c6ada",
+  "id": "8a305313-7651-42d9-a3aa-98215b890d2f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -245,7 +245,7 @@
         },
         "password": {
           "name": "password",
-          "type": "char(64)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }
