@@ -1,6 +1,6 @@
 {
-  "id": "b4747868-ea1b-4658-8508-1577a80c6ada",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "5306854e-f07d-4218-8ff4-918b1682e9e5",
+  "prevId": "9fa0bf76-ff33-4d5a-a72e-76adf8f5f8e2",
   "version": "5",
   "dialect": "pg",
   "tables": {
@@ -245,7 +245,7 @@
         },
         "password": {
           "name": "password",
-          "type": "char(64)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }

@@ -5,16 +5,19 @@
     "db:dev": "bunx supabase start",
     "db:generate": "drizzle-kit generate:pg",
     "db:login": "bunx supabase login --no-browser",
-    "db:migrate": "bunx supabase migration up",
+    "db:migrate": "bunx supabase migration up --debug && echo \"Incase, you have new seed data. Run reset\" ",
     "db:pull": "bunx supabase db pull",
     "db:push": "bunx supabase db push",
+    "db:reset": "bunx supabase db reset",
     "db:status": "bunx supabase status",
+    "debug": "bun run --inspect src/index.ts",
     "dev": "bun run --watch src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "drizzle-orm": "^0.29.3",
     "elysia": "latest",
+    "jose": "^5.2.0",
     "postgres": "^3.4.3"
   },
   "devDependencies": {

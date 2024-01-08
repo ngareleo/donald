@@ -1,11 +1,10 @@
 import { Elysia } from "elysia";
-import { db } from "./db";
-import { users } from "./schema";
+import { users } from "./controllers/user";
 
-const allUsers = await db.select().from(users);
-console.log(allUsers);
-
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+const app = new Elysia()
+  .use(users)
+  .get("/", () => "Hello Traveller!")
+  .listen(process.env.PORT || 3000);
 
 console.log(
   `🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`
