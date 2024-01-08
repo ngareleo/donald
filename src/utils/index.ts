@@ -11,8 +11,7 @@ export const getJWT = async (privateKey: string, userId: string) => {
   return jwt;
 };
 
-export const verifyJWT= async (publicKey: string, token: string) => {
+export const verifyJWT = async (publicKey: string, token: string) => {
   const pk = await jose.importSPKI(publicKey, "RS256");
-  const { payload, protectedHeader } = await jose.jwtDecrypt(token, pk);
-  return payload;
+  return await jose.jwtVerify(token, pk);
 };

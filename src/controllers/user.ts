@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia";
-import { insertUser } from "../repository/user";
-import { getJWT } from "../utils";
+import { bearer } from "@elysiajs/bearer";
+import { findUserByUsernameEmailOrPhone, insertUser } from "../repository/user";
+import { getJWT, verifyJWT } from "../utils";
 
 const readPemFiles = async () => {
   return {
@@ -11,6 +12,7 @@ const readPemFiles = async () => {
 
 export const users = new Elysia().group("/users", (app) =>
   app
+    .use(bearer())
     .state("keys", readPemFiles)
     .post(
       "/sign-up",
@@ -27,9 +29,7 @@ export const users = new Elysia().group("/users", (app) =>
           set.status = 400;
           return { message: "User already exists" };
         }
-        const { privateKey } = await keys();
-        const token = await getJWT(privateKey, String(newUser.id));
-        return { ...newUser, token };
+        return newUser;
       },
       {
         body: t.Object({
@@ -40,5 +40,50 @@ export const users = new Elysia().group("/users", (app) =>
         }),
       }
     )
-    .post("/sign-in", () => {})
+    .post(
+      "/sign-in",
+      async ({ body, set, store: { keys } }) => {
+        const { subject, password } = body;
+        if (!subject) {
+          set.status = 400;
+          return { message: "Email or Phone Number or Email is required" };
+        }
+
+        const loggedInUser = await findUserByUsernameEmailOrPhone(
+          subject,
+          password
+        );
+
+        if (!loggedInUser) {
+          set.status = 400;
+          return { message: "User not found" };
+        }
+
+        const { privateKey } = await keys();
+        const token = await getJWT(privateKey, String(loggedInUser.id));
+        return { ...loggedInUser, token };
+      },
+      {
+        body: t.Object({
+          subject: t.Optional(t.String()),
+          password: t.String(),
+        }),
+      }
+    )
+    .get("/verify", async ({ bearer, set, store: { keys } }) => {
+      if (!bearer) {
+        set.status = 400;
+        set.headers[
+          "WWW-Authenticate"
+        ] = `Bearer realm='sign', error="invalid_request"`;
+
+        return "Unauthorized";
+      }
+      const { publicKey } = await keys();
+      const { payload } = await verifyJWT(publicKey, bearer);
+
+      console.log(payload);
+
+      return "OK";
+    })
 );
