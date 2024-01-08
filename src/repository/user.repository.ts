@@ -29,6 +29,8 @@ export const findUserByUsernameEmailOrPhone = async (
   subject: string,
   usersPassword: string
 ): Promise<PublicUser | null> => {
+  // TODO: Add fix for multiple users with same username, email or phone number
+
   const lookup = await db
     .select()
     .from(usersTable)
@@ -40,7 +42,11 @@ export const findUserByUsernameEmailOrPhone = async (
       )
     ); // should not return more than one user
 
-  if (!lookup || !Bun.password.verifySync(usersPassword, lookup[0].password)) {
+  if (
+    !lookup ||
+    lookup.length === 0 ||
+    !Bun.password.verifySync(usersPassword, lookup[0].password)
+  ) {
     return null;
   }
   const { password, ...publicUser } = lookup[0];
