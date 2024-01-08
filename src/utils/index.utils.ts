@@ -1,5 +1,6 @@
 import * as jose from "jose";
 import type { JWTPayload } from "jose";
+
 import { findUserById } from "../repository/user.repository";
 
 export const getJWT = async (privateKey: string, userId: string) => {
@@ -37,14 +38,12 @@ export const verifyJWT = async (
     return "Invalid";
   }
 
-  const { exp, sub } = payload;
-
-  if (exp * 1000 <= Date.now()) {
+  if (payload.exp * 1000 <= Date.now()) {
     return "Expired";
   }
 
-  const _user = await findUserById(Number(sub));
-  if (_user == null) {
+  const user = await findUserById(Number(payload.sub));
+  if (user == null) {
     return "User not found";
   }
 
