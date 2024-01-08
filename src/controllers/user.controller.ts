@@ -1,7 +1,10 @@
 import { Elysia, t } from "elysia";
 import { bearer } from "@elysiajs/bearer";
-import { findUserByUsernameEmailOrPhone, insertUser } from "../repository/user";
-import { getJWT, verifyJWT } from "../utils";
+import {
+  findUserByUsernameEmailOrPhone,
+  insertUser,
+} from "../repository/user.repository";
+import { getJWT, verifyJWT } from "../utils/index.utils";
 
 const readPemFiles = async () => {
   return {
@@ -16,11 +19,11 @@ export const users = new Elysia().group("/users", (app) =>
     .state("keys", readPemFiles)
     .post(
       "/sign-up",
-      async ({ body, set, store: { keys } }) => {
+      async ({ body, set }) => {
         const { username, password, email, phone } = body;
         const user = {
           username,
-          password: await Bun.password.hash(password),
+          password,
           email,
           phoneNumber: phone,
         };
@@ -77,12 +80,24 @@ export const users = new Elysia().group("/users", (app) =>
           "WWW-Authenticate"
         ] = `Bearer realm='sign', error="invalid_request"`;
 
-        return "Unauthorized";
+        return "FAIL";
       }
-      const { publicKey } = await keys();
-      const { payload } = await verifyJWT(publicKey, bearer);
 
-      console.log(payload);
+      const { publicKey } = await keys();
+      const payload = await verifyJWT(publicKey, bearer);
+
+      if (typeof payload === "string") {
+        set.status = 400;
+        set.headers[
+          "WWW-Authenticate"
+        ] = `Bearer realm='sign', error="invalid_token"`;
+        switch (payload) {
+          case "Invalid":
+          case "Expired":
+          case "User not found":
+            return "FAIL";
+        }
+      }
 
       return "OK";
     })
