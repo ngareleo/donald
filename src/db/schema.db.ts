@@ -10,7 +10,7 @@ export const usersTable = pgTable("user", {
   ...defaultFields,
   username: text("username").unique().notNull(),
   email: text("email").unique().notNull(),
-  phoneNumber: text("phone_number").unique().notNull(),
+  phoneNumber: text("phone_number").unique(),
   password: text("password").unique().notNull(),
 });
 

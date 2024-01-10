@@ -5,6 +5,11 @@ import type { NewUser } from "../db/schema.db";
 import { usersTable } from "../db/schema.db";
 
 type PublicUser = Required<Omit<NewUser, "password">>;
+type FindUserResponse =
+  | PublicUser
+  | "Something went wrong"
+  | "User not found"
+  | "Incorrect password";
 
 export const insertUser = async (
   newUser: NewUser
@@ -25,29 +30,23 @@ export const insertUser = async (
   return res ? res[0] : null;
 };
 
-export const findUserByUsernameEmailOrPhone = async (
+export const findUserByUsername = async (
   subject: string,
   usersPassword: string
-): Promise<PublicUser | null> => {
-  // TODO: Add fix for multiple users with same username, email or phone number
+): Promise<FindUserResponse> => {
+  console.log(subject, usersPassword);
 
   const lookup = await db
     .select()
     .from(usersTable)
-    .where(
-      or(
-        eq(usersTable.username, subject),
-        eq(usersTable.email, subject),
-        eq(usersTable.phoneNumber, subject)
-      )
-    ); // should not return more than one user
+    .where(eq(usersTable.username, subject)); // should not return more than one user
 
-  if (
-    !lookup ||
-    lookup.length === 0 ||
-    !Bun.password.verifySync(usersPassword, lookup[0].password)
-  ) {
-    return null;
+  if (!lookup) {
+    return "Something went wrong";
+  } else if (lookup.length === 0) {
+    return "User not found";
+  } else if (!Bun.password.verifySync(usersPassword, lookup[0].password)) {
+    return "Incorrect password";
   }
   const { password, ...publicUser } = lookup[0];
   return publicUser as PublicUser;

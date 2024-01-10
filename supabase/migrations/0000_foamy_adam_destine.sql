@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 	"last_modified" timestamp DEFAULT now(),
 	"username" text NOT NULL,
 	"email" text NOT NULL,
-	"phone_number" text NOT NULL,
+	"phone_number" text,
 	"password" text NOT NULL,
 	CONSTRAINT "user_username_unique" UNIQUE("username"),
 	CONSTRAINT "user_email_unique" UNIQUE("email"),

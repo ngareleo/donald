@@ -1,9 +1,6 @@
 import { Elysia, t } from "elysia";
 import { bearer } from "@elysiajs/bearer";
-import {
-  findUserByUsernameEmailOrPhone,
-  insertUser,
-} from "../repository/user.repository";
+import { findUserByUsername, insertUser } from "../repository/user.repository";
 import { getJWT, verifyJWT } from "../utils/index.utils";
 
 const readPemFiles = async () => {
@@ -20,12 +17,11 @@ export const users = new Elysia().group("/users", (app) =>
     .post(
       "/sign-up",
       async ({ body, set }) => {
-        const { username, password, email, phone } = body;
+        const { username, password, email } = body;
         const user = {
           username,
           password,
           email,
-          phoneNumber: phone,
         };
         const newUser = await insertUser(user);
         if (!newUser) {
@@ -39,7 +35,6 @@ export const users = new Elysia().group("/users", (app) =>
           username: t.String(),
           password: t.String(),
           email: t.String(),
-          phone: t.String(),
         }),
       }
     )
@@ -52,19 +47,18 @@ export const users = new Elysia().group("/users", (app) =>
           return { message: "Email or Phone Number or Email is required" };
         }
 
-        const loggedInUser = await findUserByUsernameEmailOrPhone(
-          subject,
-          password
-        );
+        const response = await findUserByUsername(subject, password);
 
-        if (!loggedInUser) {
+        console.log(response);
+
+        if (typeof response === "string") {
           set.status = 400;
-          return { message: "User not found" };
+          return { message: response };
         }
 
         const { privateKey } = await keys();
-        const token = await getJWT(privateKey, String(loggedInUser.id));
-        return { ...loggedInUser, token };
+        const token = await getJWT(privateKey, String(response.id));
+        return { ...response, token };
       },
       {
         body: t.Object({

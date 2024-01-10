@@ -1,5 +1,5 @@
 {
-  "id": "8a305313-7651-42d9-a3aa-98215b890d2f",
+  "id": "81bbbc0b-1dd9-4976-9fc7-c8b2da9420e9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -241,7 +241,7 @@
           "name": "phone_number",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "password": {
           "name": "password",
