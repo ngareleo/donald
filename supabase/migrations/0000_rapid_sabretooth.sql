@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS "transaction" (
 	"balance" integer,
 	"transaction_cost" integer DEFAULT 0,
 	"location" text,
+	"interest" integer DEFAULT 0,
+	"agent_number" text,
 	"user_id" integer,
 	CONSTRAINT "transaction_transaction_code_unique" UNIQUE("transaction_code")
 );

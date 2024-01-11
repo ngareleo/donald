@@ -3,11 +3,14 @@ import { logger } from "@grotto/logysia";
 import { rateLimit } from "elysia-rate-limit";
 
 import { users } from "./controllers/user.controller";
+import { upload } from "./controllers/upload.controller";
 
 const app = new Elysia()
   .use(logger({ logIP: true }))
   .use(rateLimit())
+  .get("/", () => "Hello Traveller!")
   .use(users)
+  .use(upload)
   .onError(({ code, error, set }) => {
     console.error(error);
     switch (code) {
@@ -24,7 +27,6 @@ const app = new Elysia()
         return "Bad Request :(";
     }
   })
-  .get("/", () => "Hello Traveller!")
   .listen(process.env.PORT || 3000);
 
 console.log(

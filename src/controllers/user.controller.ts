@@ -1,14 +1,7 @@
 import { Elysia, t } from "elysia";
 import { bearer } from "@elysiajs/bearer";
 import { findUserByUsername, insertUser } from "../repository/user.repository";
-import { getJWT, verifyJWT } from "../utils/index.utils";
-
-const readPemFiles = async () => {
-  return {
-    publicKey: await Bun.file("./bin/public_key.pem").text(),
-    privateKey: await Bun.file("./bin/private_key.pem").text(),
-  };
-};
+import { getJWT, readPemFiles, verifyJWT } from "../utils/index.utils";
 
 export const users = new Elysia().group("/users", (app) =>
   app
@@ -49,8 +42,6 @@ export const users = new Elysia().group("/users", (app) =>
 
         const response = await findUserByUsername(subject, password);
 
-        console.log(response);
-
         if (typeof response === "string") {
           set.status = 400;
           return { message: response };
@@ -68,6 +59,8 @@ export const users = new Elysia().group("/users", (app) =>
       }
     )
     .get("/verify", async ({ bearer, set, store: { keys } }) => {
+      // for testing 
+      
       if (!bearer) {
         set.status = 400;
         set.headers[

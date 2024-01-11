@@ -3,6 +3,13 @@ import type { JWTPayload } from "jose";
 
 import { findUserById } from "../repository/user.repository";
 
+export const readPemFiles = async () => {
+  return {
+    publicKey: await Bun.file("./bin/public_key.pem").text(),
+    privateKey: await Bun.file("./bin/private_key.pem").text(),
+  };
+};
+
 export const getJWT = async (privateKey: string, userId: string) => {
   const pk = await jose.importPKCS8(privateKey, "RS256");
   const jwt = await new jose.SignJWT()
@@ -48,4 +55,20 @@ export const verifyJWT = async (
   }
 
   return payload;
+};
+
+export type UploadTransactionDTO = {
+  agentNumber?: string | null;
+  balance: number;
+  dateTime: string;
+  interest?: number;
+  location: string | null;
+  messageId: string;
+  transactionCode: string;
+  transactionAmount: number;
+  subject: string | null;
+  subjectPhoneNumber?: string | null;
+  subjectAccount: string | null;
+  transactionCost: number | null;
+  type: string;
 };

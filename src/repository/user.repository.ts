@@ -7,9 +7,9 @@ import { usersTable } from "../db/schema.db";
 type PublicUser = Required<Omit<NewUser, "password">>;
 type FindUserResponse =
   | PublicUser
-  | "Something went wrong"
-  | "User not found"
-  | "Incorrect password";
+  | "something_went_wrong"
+  | "user_not_found"
+  | "incorrect_password";
 
 export const insertUser = async (
   newUser: NewUser
@@ -42,11 +42,11 @@ export const findUserByUsername = async (
     .where(eq(usersTable.username, subject)); // should not return more than one user
 
   if (!lookup) {
-    return "Something went wrong";
+    return "something_went_wrong";
   } else if (lookup.length === 0) {
-    return "User not found";
+    return "user_not_found";
   } else if (!Bun.password.verifySync(usersPassword, lookup[0].password)) {
-    return "Incorrect password";
+    return "incorrect_password";
   }
   const { password, ...publicUser } = lookup[0];
   return publicUser as PublicUser;

@@ -1,5 +1,5 @@
 {
-  "id": "81bbbc0b-1dd9-4976-9fc7-c8b2da9420e9",
+  "id": "8a5a4114-9c4f-42da-b260-fbc0eb559e3d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -148,6 +148,19 @@
         },
         "location": {
           "name": "location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interest": {
+          "name": "interest",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "agent_number": {
+          "name": "agent_number",
           "type": "text",
           "primaryKey": false,
           "notNull": false

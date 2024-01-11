@@ -27,15 +27,19 @@ export const transactionsTable = pgTable("transaction", {
   type: integer("type")
     .references(() => transactionTypeTable.id)
     .notNull(),
-  sourceMessageId: integer("source_message_id").notNull(),
+  messageId: integer("source_message_id").notNull(),
   transactionCode: text("transaction_code").unique().notNull(),
-  transactionAmount: integer("transaction_amount").notNull(),
+  transactionAmount: integer("transaction_amount").notNull(), // in cents
   subject: text("subject").notNull(),
   subjectPhoneNumber: text("subject_phone_number"),
   subjectAccount: text("subject_account"),
   dateTime: timestamp("date_time").notNull(),
   balance: integer("balance"),
-  transactionCost: integer("transaction_cost").default(0),
+  transactionCost: integer("transaction_cost").default(0), // in cents
   location: text("location"),
+  interest: integer("interest").default(0), // in cents
+  agentNumber: text("agent_number"),
   userId: integer("user_id").references(() => usersTable.id),
 });
+
+export type NewTransaction = typeof transactionsTable.$inferInsert;
