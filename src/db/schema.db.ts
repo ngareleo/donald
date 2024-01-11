@@ -42,4 +42,23 @@ export const transactionsTable = pgTable("transaction", {
   userId: integer("user_id").references(() => usersTable.id),
 });
 
+export const tagsTable = pgTable("tags", {
+  ...defaultFields,
+  name: text("name").notNull(),
+  description: text("description"),
+  userId: integer("user_id").references(() => usersTable.id),
+});
+
+export type NewTag = typeof tagsTable.$inferInsert;
+
+export const transactionTagsTable = pgTable("transaction_tags_table", {
+  ...defaultFields,
+  tagId: integer("tag_id").references(() => tagsTable.id),
+  transactionId: integer("transaction_id").references(
+    () => transactionsTable.id
+  ),
+});
+
+export type NewTransactionTag = typeof transactionTagsTable.$inferInsert;
+
 export type NewTransaction = typeof transactionsTable.$inferInsert;

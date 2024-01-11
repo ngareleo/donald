@@ -37,7 +37,15 @@ export const findUserByUsername = async (
   console.log(subject, usersPassword);
 
   const lookup = await db
-    .select()
+    .select({
+      id: usersTable.id,
+      username: usersTable.username,
+      email: usersTable.email,
+      phoneNumber: usersTable.phoneNumber,
+      dateAdded: usersTable.dateAdded,
+      lastModified: usersTable.lastModified,
+      password: usersTable.password,
+    })
     .from(usersTable)
     .where(eq(usersTable.username, subject)); // should not return more than one user
 
@@ -52,12 +60,20 @@ export const findUserByUsername = async (
   return publicUser as PublicUser;
 };
 
-export const findUserById = async (id: number): Promise<PublicUser | null> => {
-  const res = await db.select().from(usersTable).where(eq(usersTable.id, id));
-  if (res != null && res.length > 0) {
-    const { password, ...publicUser } = res[0];
-    return publicUser as PublicUser;
+export const findUserById = async (id: number) => {
+  const res = await db
+    .select({
+      id: usersTable.id,
+      username: usersTable.username,
+      email: usersTable.email,
+      phoneNumber: usersTable.phoneNumber,
+      dateAdded: usersTable.dateAdded,
+      lastModified: usersTable.lastModified,
+    })
+    .from(usersTable)
+    .where(eq(usersTable.id, id));
+  if (!res || res.length === 0) {
+    return null;
   }
-
-  return null;
+  return res[0];
 };

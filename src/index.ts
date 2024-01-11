@@ -4,6 +4,7 @@ import { rateLimit } from "elysia-rate-limit";
 
 import { users } from "./controllers/user.controller";
 import { upload } from "./controllers/upload.controller";
+import { tags } from "./controllers/tag.controller";
 
 const app = new Elysia()
   .use(logger({ logIP: true }))
@@ -11,6 +12,7 @@ const app = new Elysia()
   .get("/", () => "Hello Traveller!")
   .use(users)
   .use(upload)
+  .use(tags)
   .onError(({ code, error, set }) => {
     console.error(error);
     switch (code) {
