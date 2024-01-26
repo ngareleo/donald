@@ -22,7 +22,7 @@ export const authenticateUser = new Elysia()
   .state("keys", readPemFiles)
   .onBeforeHandle(async ({ bearer, set, store: { keys } }) => {
     if (!bearer) {
-      set.status = 400;
+      set.status = 401;
       set.headers[
         "WWW-Authenticate"
       ] = `Bearer realm='sign', error="invalid_request"`;
@@ -34,7 +34,7 @@ export const authenticateUser = new Elysia()
     const payload = await verifyJWT(publicKey, bearer);
 
     if (typeof payload === "string") {
-      set.status = 400;
+      set.status = 401;
       set.headers[
         "WWW-Authenticate"
       ] = `Bearer realm='sign', error="invalid_token"`;

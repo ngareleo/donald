@@ -10,7 +10,7 @@
     "db:push": "bunx supabase db push",
     "db:reset": "bunx supabase db reset",
     "db:status": "bunx supabase status",
-    "debug": "bun run --inspect src/index.ts",
+    "debug": "bun run --inspect=localhost:4000 src/index.ts",
     "dev": "bun run --watch src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

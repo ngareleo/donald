@@ -2,54 +2,50 @@ import { pgTable, serial, timestamp, text, integer } from "drizzle-orm/pg-core";
 
 const defaultFields = {
   id: serial("id").primaryKey(),
-  dateAdded: timestamp("date_added").defaultNow(),
-  lastModified: timestamp("last_modified").defaultNow(),
+  dateAdded: timestamp("date_added").notNull().defaultNow(),
+  lastModified: timestamp("last_modified").notNull().defaultNow(),
 };
-
-export const usersTable = pgTable("user", {
-  ...defaultFields,
-  username: text("username").unique().notNull(),
-  email: text("email").unique().notNull(),
-  phoneNumber: text("phone_number").unique(),
-  password: text("password").unique().notNull(),
-});
-
-export type NewUser = typeof usersTable.$inferInsert;
 
 export const transactionTypeTable = pgTable("transaction_type", {
   ...defaultFields,
-  name: text("name").unique().notNull(),
   description: text("description").unique().notNull(),
+  name: text("name").unique().notNull(),
 });
 
 export const transactionsTable = pgTable("transaction", {
   ...defaultFields,
+  agentNumber: text("agent_number"),
+  balance: integer("balance"),
+  dateTime: timestamp("date_time").notNull(),
+  interest: integer("interest").default(0), // in cents
+  location: text("location"),
+  messageId: integer("source_message_id").notNull(),
+  subject: text("subject").notNull(),
+  subjectAccount: text("subject_account"),
+  subjectPhoneNumber: text("subject_phone_number"),
+  transactionAmount: integer("transaction_amount").notNull(), // in cents
+  transactionCode: text("transaction_code").unique().notNull(),
+  transactionCost: integer("transaction_cost").default(0), // in cents
   type: integer("type")
     .references(() => transactionTypeTable.id)
     .notNull(),
-  messageId: integer("source_message_id").notNull(),
-  transactionCode: text("transaction_code").unique().notNull(),
-  transactionAmount: integer("transaction_amount").notNull(), // in cents
-  subject: text("subject").notNull(),
-  subjectPhoneNumber: text("subject_phone_number"),
-  subjectAccount: text("subject_account"),
-  dateTime: timestamp("date_time").notNull(),
-  balance: integer("balance"),
-  transactionCost: integer("transaction_cost").default(0), // in cents
-  location: text("location"),
-  interest: integer("interest").default(0), // in cents
-  agentNumber: text("agent_number"),
   userId: integer("user_id").references(() => usersTable.id),
+});
+
+export const usersTable = pgTable("user", {
+  ...defaultFields,
+  email: text("email").unique().notNull(),
+  password: text("password").unique().notNull(),
+  phoneNumber: text("phone_number").unique(),
+  username: text("username").unique().notNull(),
 });
 
 export const tagsTable = pgTable("tags", {
   ...defaultFields,
-  name: text("name").notNull(),
   description: text("description"),
+  name: text("name").notNull(),
   userId: integer("user_id").references(() => usersTable.id),
 });
-
-export type NewTag = typeof tagsTable.$inferInsert;
 
 export const transactionTagsTable = pgTable("transaction_tags_table", {
   ...defaultFields,
@@ -59,6 +55,7 @@ export const transactionTagsTable = pgTable("transaction_tags_table", {
   ),
 });
 
-export type NewTransactionTag = typeof transactionTagsTable.$inferInsert;
-
+export type NewTag = typeof tagsTable.$inferInsert;
 export type NewTransaction = typeof transactionsTable.$inferInsert;
+export type NewTransactionTag = typeof transactionTagsTable.$inferInsert;
+export type NewUser = typeof usersTable.$inferInsert;
