@@ -23,7 +23,6 @@ export const upload = new Elysia()
     app.group("/upload", (app) =>
       app.post(
         "/transactions",
-
         async ({ body, user, store: { transactionTypes } }) => {
           const { raw } = body;
           const transactions = raw.map((transaction) => {

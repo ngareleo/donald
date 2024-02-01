@@ -59,8 +59,8 @@ export const users = new Elysia().group("/users", (app) =>
       }
     )
     .get("/verify", async ({ bearer, set, store: { keys } }) => {
-      // for testing 
-      
+      // for testing
+
       if (!bearer) {
         set.status = 400;
         set.headers[

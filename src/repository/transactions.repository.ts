@@ -26,7 +26,7 @@ export const insertNewTransactions = async (transactions: NewTransaction[]) => {
   var allSuccess = true;
   const oks = [];
   const duplicates = [];
-  const unknowns = [];
+  const failed = [];
 
   for (const response of res) {
     const { message, value, payload } = response;
@@ -39,7 +39,7 @@ export const insertNewTransactions = async (transactions: NewTransaction[]) => {
         allSuccess = false;
         break;
       case "unknown":
-        unknowns.push(value);
+        failed.push(value);
         allSuccess = false;
         break;
     }
@@ -49,7 +49,7 @@ export const insertNewTransactions = async (transactions: NewTransaction[]) => {
     message: allSuccess ? "success" : "partial",
     oks,
     duplicates,
-    unknowns,
+    failed,
   };
 };
 
