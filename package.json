@@ -12,6 +12,7 @@
     "db:status": "bunx supabase status",
     "debug": "bun run --inspect=localhost:4000 src/index.ts",
     "dev": "bun run --watch src/index.ts",
+    "ssh:generate": "rm -rf ./bin && mkdir ./bin && openssl genpkey -algorithm RSA -out ./bin/private_key.pem -pkeyopt rsa_keygen_bits:4096 && openssl rsa -pubout -in ./bin/private_key.pem -out ./bin/public_key.pem",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
