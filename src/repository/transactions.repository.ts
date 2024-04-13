@@ -1,4 +1,4 @@
-import { db } from "../db/index.db";
+import { db } from "../db";
 import { NewTransaction, transactionsTable } from "../db/schema.db";
 
 export type InsertResponseType = {

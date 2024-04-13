@@ -1,9 +1,6 @@
 import { Elysia, t } from "elysia";
 
-import {
-  authenticateUser,
-  loadTransactionTypes,
-} from "../middleware/index.middleware";
+import { authenticateUser, loadTransactionTypes } from "../middleware";
 import {
   getTagById,
   insertNewTag,

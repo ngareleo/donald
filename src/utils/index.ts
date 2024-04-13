@@ -5,8 +5,8 @@ import { findUserById } from "../repository/user.repository";
 
 export const readPemFiles = async () => {
   return {
-    publicKey: await Bun.file("./bin/public_key.pem").text(),
-    privateKey: await Bun.file("./bin/private_key.pem").text(),
+    publicKey: await Bun.file("./temp/public_key.pem").text(),
+    privateKey: await Bun.file("./temp/private_key.pem").text(),
   };
 };
 

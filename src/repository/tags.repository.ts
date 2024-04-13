@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "../db/index.db";
+import { db } from "../db";
 import {
   type NewTag,
   tagsTable,
