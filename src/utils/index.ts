@@ -1,6 +1,5 @@
 import * as jose from "jose";
 import type { JWTPayload } from "jose";
-
 import { findUserById } from "../repository/user.repository";
 
 export const readPemFiles = async () => {

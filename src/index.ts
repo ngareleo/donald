@@ -1,6 +1,5 @@
 import { Elysia } from "elysia";
 import { logger } from "@grotto/logysia";
-
 import { users } from "./controllers/user.controller";
 import { upload } from "./controllers/upload.controller";
 import { tags } from "./controllers/tag.controller";

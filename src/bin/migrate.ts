@@ -1,5 +1,10 @@
 import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { db, adminConnection } from "../db";
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
+import * as schema from "../db/schema.db";
 
-await migrate(db, { migrationsFolder: "supabase/migrations" });
-await adminConnection.end();
+const adminDbConnection = postgres(process.env.ADMIN_DB_URL || "");
+const client = drizzle(adminDbConnection, { schema });
+
+await migrate(client, { migrationsFolder: "supabase/migrations" });
+await adminDbConnection.end();

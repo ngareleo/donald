@@ -1,5 +1,4 @@
-import { eq, or } from "drizzle-orm";
-
+import { eq } from "drizzle-orm";
 import { db } from "../db";
 import type { NewUser } from "../db/schema.db";
 import { usersTable } from "../db/schema.db";
