@@ -12,7 +12,9 @@
     "db:status": "bunx supabase status",
     "debug": "bun run --inspect=localhost:4000 src/index.ts",
     "dev": "bun run --watch src/index.ts",
-    "ssh:generate": "rm -rf ./bin && mkdir ./bin && openssl genpkey -algorithm RSA -out ./bin/private_key.pem -pkeyopt rsa_keygen_bits:4096 && openssl rsa -pubout -in ./bin/private_key.pem -out ./bin/public_key.pem",
+    "generate:ssh": "rm -rf ./bin && mkdir ./bin && openssl genpkey -algorithm RSA -out ./bin/private_key.pem -pkeyopt rsa_keygen_bits:4096 && openssl rsa -pubout -in ./bin/private_key.pem -out ./bin/public_key.pem",
+    "generate:env": "echo $(bunx supabase status -o env) >> .env",
+    "start": "bun run src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -22,12 +24,14 @@
     "elysia": "latest",
     "elysia-rate-limit": "^2.0.1",
     "jose": "^5.2.0",
+    "openssl": "^2.0.0",
+    "supabase": "^1.127.4",
     "postgres": "^3.4.3"
   },
   "devDependencies": {
     "bun-types": "latest",
-    "drizzle-kit": "^0.20.10",
-    "supabase": "^1.127.4"
+    "drizzle-kit": "^0.20.10"
   },
+  "trustedDependencies": ["supabase"],
   "module": "src/index.js"
 }
