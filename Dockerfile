@@ -16,6 +16,6 @@ COPY --from=install /temp/prod/node_modules node_modules
 COPY . .
 
 # Run the app
-USER bun
-EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "run", "start" ]
+EXPOSE 3000
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["./entrypoint.sh"]
