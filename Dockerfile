@@ -4,13 +4,13 @@ WORKDIR /usr/src/app
 FROM base AS dev
 RUN mkdir -p /temp/dev
 COPY package.json /temp/dev/
-RUN cd /temp/dev && bun install --verbose --force --ignore-scripts
+RUN cd /temp/dev && bun install --force --ignore-scripts
 RUN apt-get update && apt-get install -y openssl
 
 FROM base AS install
 RUN mkdir -p /temp/prod
 COPY package.json /temp/prod/
-RUN cd /temp/prod && NODE_OPTIONS=--no-experimental-fetch bun install --verbose --force --production
+RUN cd /temp/prod && NODE_OPTIONS=--no-experimental-fetch bun install --force --production
 
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
