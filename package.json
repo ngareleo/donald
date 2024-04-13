@@ -24,7 +24,6 @@
     "elysia": "latest",
     "elysia-rate-limit": "^2.0.1",
     "jose": "^5.2.0",
-    "openssl": "^2.0.0",
     "postgres": "^3.4.3"
   },
   "devDependencies": {
