@@ -13,4 +13,5 @@ helm-charts
 .editorconfig
 .idea
 coverage*
-bin/
+bin
+temp

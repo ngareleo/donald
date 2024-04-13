@@ -1,5 +1,5 @@
 import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { db, client } from "../db";
+import { db, adminConnection } from "../db";
 
 await migrate(db, { migrationsFolder: "supabase/migrations" });
-await client.end();
+await adminConnection.end();
