@@ -5,7 +5,6 @@ FROM base AS dev
 RUN mkdir -p /temp/dev
 COPY package.json /temp/dev/
 RUN cd /temp/dev && bun install --force --ignore-scripts
-RUN apt-get update && apt-get install -y openssl
 
 FROM base AS install
 RUN mkdir -p /temp/prod
