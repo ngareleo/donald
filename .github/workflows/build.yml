@@ -24,16 +24,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: oven-sh/setup-bun@v1
-        with: 
-          node-version: '21.7.2'
       - run: bun run db:dev
   start-server:
     needs: [install-dependencies, start-db]
     runs-on: ubuntu-latest
     steps:
       - uses: oven-sh/setup-bun@v1
-        with:
-          node-version: '21.7.2'
       - run: bun run dev
 
 
