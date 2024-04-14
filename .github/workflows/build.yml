@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  install dependencies:
+  install-dependencies:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,13 +18,13 @@ jobs:
         with:
           node-version: '21.7.2'
       - run: bun install
-  start db:
-    needs: install dependencies
+  start-db:
+    needs: install-dependencies
     runs-on: ubuntu-latest
     steps:
       - run: bun run db:dev
-  start server:
-    needs: [install dependencies, start db]
+  start-server:
+    needs: [install-dependencies, start-db]
     runs-on: ubuntu-latest
     steps:
       - run: bun run dev
