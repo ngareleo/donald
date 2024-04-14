@@ -6,5 +6,6 @@ import * as schema from "../db/schema.db";
 const adminDbConnection = postgres(process.env.ADMIN_DB_URL || "");
 const client = drizzle(adminDbConnection, { schema });
 
-await migrate(client, { migrationsFolder: "supabase/migrations" });
-await adminDbConnection.end();
+migrate(client, { migrationsFolder: "supabase/migrations" }).then(() =>
+  adminDbConnection.end()
+);
