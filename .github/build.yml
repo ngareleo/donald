@@ -3,8 +3,11 @@ run-name: ${{github.actor}} made changes
 
 on:
   push:
-    branches-ignore:
-      - 'tito/add-ci'
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   install dependencies:
