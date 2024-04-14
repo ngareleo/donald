@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import { bearer } from "@elysiajs/bearer";
 import { findUserByUsername, insertUser } from "../repository/user.repository";
-import { getJWT, readPemFiles, verifyJWT } from "../utils/index.utils";
+import { getJWT, readPemFiles, verifyJWT } from "../utils";
 
 export const users = new Elysia().group("/users", (app) =>
   app

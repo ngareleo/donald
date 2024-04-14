@@ -1,9 +1,5 @@
 import { Elysia, t } from "elysia";
-
-import {
-  authenticateUser,
-  loadTransactionTypes,
-} from "../middleware/index.middleware";
+import { authenticateUser, loadTransactionTypes } from "../middleware";
 import { insertNewTransactions } from "../repository/transactions.repository";
 
 export const upload = new Elysia()
@@ -51,7 +47,7 @@ export const upload = new Elysia()
               userId: user?.id,
             };
           });
-          
+
           return await insertNewTransactions(transactions);
         },
         {

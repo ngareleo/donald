@@ -1,8 +1,8 @@
 import { Elysia, t } from "elysia";
 import bearer from "@elysiajs/bearer";
 
-import { db } from "../db/index.db";
-import { readPemFiles, verifyJWT } from "../utils/index.utils";
+import { db } from "../db";
+import { readPemFiles, verifyJWT } from "../utils";
 import { findUserById } from "../repository/user.repository";
 
 export const loadTransactionTypes = new Elysia().state(
