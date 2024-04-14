@@ -12,6 +12,10 @@
     "db:status": "bunx supabase status",
     "debug": "bun run --inspect=localhost:4000 src/index.ts",
     "dev": "bun run --watch src/index.ts",
+    "generate:ssh": "rm -rf ./temp && mkdir ./temp && openssl genpkey -algorithm RSA -out ./temp/private_key.pem -pkeyopt rsa_keygen_bits:4096 && openssl rsa -pubout -in ./temp/private_key.pem -out ./temp/public_key.pem",
+    "generate:env": "echo $(bunx supabase status -o env) >> .env",
+    "migrate": "bun run src/bin/migrate.ts",
+    "start": "bun run src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
