@@ -20,20 +20,28 @@ jobs:
   start-db:
     needs: install-dependencies
     runs-on: ubuntu-latest
-    outputs:
-      DB_URL: ${{ steps.start-db-output.outputs.db-url}}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
-      - id: start-db-output
-        run: |
-          db_url=$(bunx supabase start | grep -oE 'postgresql://[^ ]+')
-          echo "::set-output name=db-url::$db_url"
-  start-server:
+      - run: bunx supabase start
+  check-db-status:
     needs: [install-dependencies, start-db]
     runs-on: ubuntu-latest
+    outputs:
+      db_url: ${{ steps.extract-db-url.outputs.db-url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - id: extract-db-url
+        run: |
+          db_url=$(bunx supabase status | grep 'DB URL' | awk '{print $3}')
+          echo "::set-output name=db-url::$db_url"
+
+  start-server:
+    needs: [install-dependencies, start-db, check-db-status]
+    runs-on: ubuntu-latest
     env:
-      DB_URL: ${{needs.start-db.outputs.DB_URL}}
+      DB_URL: ${{needs.check-db-status.outputs.DB_URL}}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
