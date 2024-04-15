@@ -17,7 +17,6 @@ jobs:
       - uses: actions/setup-node@v4
       - uses: oven-sh/setup-bun@v1
       - run: bun install
-      - run: bun list
   start-db:
     needs: install-dependencies
     runs-on: ubuntu-latest
