@@ -29,6 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: oven-sh/setup-bun@v1
-      - run: bun run dev
+      - run: bun run --watch src/index.ts
 
 
