@@ -41,7 +41,7 @@ jobs:
     needs: [install-dependencies, start-db, check-db-status]
     runs-on: ubuntu-latest
     env:
-      DB_URL: ${{needs.check-db-status.outputs.DB_URL}}
+      DB_URL: ${{needs.check-db-status.outputs.db_url}}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
