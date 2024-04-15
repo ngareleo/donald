@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: oven-sh/setup-bun@v1
-      - run: bun run db:dev
+      - run: bunx supabase start
   start-server:
     needs: [install-dependencies, start-db]
     runs-on: ubuntu-latest
