@@ -28,24 +28,29 @@ jobs:
     needs: [install-dependencies, start-db]
     runs-on: ubuntu-latest
     outputs:
-      db_url: ${{ steps.extract-db-url.outputs.db-url }}
+      db_url: ${{steps.extract-db-url.outputs.DB_URL}}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
       - id: extract-db-url
         run: |
-          db_url=$(bunx supabase status | grep 'DB URL' | awk '{print $3}')
-          echo "::set-output name=db-url::$db_url"
+          result=$(bunx subabase start)
+          db_url=$(echo "$result" | grep -o 'DB URL: [^ ]*' | awk '{print $3}')
+          echo "DB URL: $db_url"
+          echo "DB_URL=$db_url" >> $GITHUB_OUTPUT
+
 
   start-server:
     needs: [install-dependencies, start-db, check-db-status]
     runs-on: ubuntu-latest
-    env:
-      DB_URL: ${{needs.check-db-status.outputs.db_url}}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
       - run: bun install 
-      - run: bun run --watch src/index.ts
+      - env:
+          DB_URL: ${{needs.check-db-status.outputs.db_url}}
+        run: |
+          echo '$DB_URL'
+          bun run --watch src/index.ts
 
 
