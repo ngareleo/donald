@@ -34,7 +34,7 @@ jobs:
       - uses: oven-sh/setup-bun@v1
       - id: extract-db-url
         run: |
-          result=$(bunx subabase start)
+          result=$(bunx supabase status)
           db_url=$(echo "$result" | grep -o 'DB URL: [^ ]*' | awk '{print $3}')
           echo "DB URL: $db_url"
           echo "DB_URL=$db_url" >> $GITHUB_OUTPUT
