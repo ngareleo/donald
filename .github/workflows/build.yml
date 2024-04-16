@@ -17,11 +17,9 @@ jobs:
       - uses: actions/setup-node@v4
       - uses: oven-sh/setup-bun@v1
       - run: bun install
-  db-setup:
+  start-server:
     needs: install-dependencies
     runs-on: ubuntu-latest
-    outputs:
-      db_url: ${{steps.extract-db-url.outputs.DB_URL}}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
@@ -31,18 +29,8 @@ jobs:
           result=$(bunx supabase status)
           db_url=$(echo "$result" | grep -o 'DB URL: [^ ]*' | awk '{print $3}')
           echo "DB URL: $db_url"
-          echo "DB_URL=$db_url" >> $GITHUB_OUTPUT
-  start-server:
-    needs: [install-dependencies, db-setup]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-      - run: bun install 
-      - env:
-          DB_URL: ${{needs.db-setup.outputs.db_url}}
-        run: |
-          echo '$DB_URL'
+          echo "DB_URL=$db_url" >> $GITHUB_ENV
+          bun install 
           bun run --watch src/index.ts
 
 
