@@ -1,20 +1,19 @@
-name: create docker image
+name: Docker Execute
 run-name: ${{github.actor}} initiated a docker image build
 
 on:
-  workflow_run:
-    workflows: ['build']
-    types: ['requested']
+  push:
     branches:
-      - 'main'
+      - '*'
 
 jobs:
-  build a docker image:
+  docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-    runs:
-      using: 'docker'
-      image: 'Dockerfile'
+      - name: Build an run Docker Image
+        run: |
+          docker build -t app_api .
+          docker run app_api
 
 

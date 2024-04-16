@@ -4,9 +4,6 @@ run-name: ${{github.actor}} made changes
 on:
   push:
     branches:
-      - '*'
-  pull_request:
-    branches:
       - main
 
 jobs:
