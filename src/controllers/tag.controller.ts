@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { authenticateUser, loadTransactionTypes } from "../middleware";
+import { useAuthenticateUser, useTransactionTypes } from "../middleware";
 import {
   getTagById,
   insertNewTag,
@@ -12,8 +12,8 @@ const TagDTO = t.Object({
 });
 
 export const tags = new Elysia()
-  .use(authenticateUser)
-  .use(loadTransactionTypes)
+  .use(useAuthenticateUser)
+  .use(useTransactionTypes)
   .group("/tag", (app) =>
     app
       .post(

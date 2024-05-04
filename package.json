@@ -21,6 +21,7 @@
   "dependencies": {
     "@elysiajs/bearer": "^0.8.0",
     "@grotto/logysia": "^0.1.1",
+    "@sinclair/typebox": "^0.32.28",
     "drizzle-orm": "^0.29.3",
     "elysia": "latest",
     "elysia-rate-limit": "^2.0.1",
