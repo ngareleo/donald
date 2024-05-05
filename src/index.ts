@@ -2,7 +2,7 @@ import { Elysia } from "elysia";
 import { logger } from "@grotto/logysia";
 import UsersController from "./controllers/user/@main";
 import UploadController from "./controllers/upload/@main";
-import { tags as TagsController } from "./controllers/tag.controller";
+import TagsController from "./controllers/tag/@main";
 import { useMainApplicationErrorHandling } from "./utils";
 
 const app = new Elysia()
