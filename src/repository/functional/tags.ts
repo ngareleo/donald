@@ -1,12 +1,12 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "../db";
 import {
-  type NewTag,
-  tagsTable,
-  type NewTransactionTag,
+  db,
   transactionTagsTable,
   transactionsTable,
-} from "../db/schema.db";
+  tagsTable,
+  type NewTag,
+  type NewTransactionTag,
+} from "..";
 
 export const insertNewTag = async (payload: NewTag | NewTag[]) => {
   const pa = Array.isArray(payload) ? payload : [payload];

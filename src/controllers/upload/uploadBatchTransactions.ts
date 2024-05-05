@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 import { useAuthenticateUser, useTransactionTypes } from "../../middleware";
 import { IncomingTransactionPayloadDTO } from "./uploadBatchTransactions.meta";
-import { insertNewTransactions } from "../../repository/transactions.repository";
+import { insertNewTransactions } from "../../repository";
 
 /**
  * Recieves a payload of transactions uploads the payload atomically

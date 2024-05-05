@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { insertUser } from "../../repository/user.repository";
+import { insertUser } from "../../repository";
 import { UserRegisterDTO } from "./registerUser.meta";
 import { useGlobalUserControllerPlugins } from "./utils";
 
