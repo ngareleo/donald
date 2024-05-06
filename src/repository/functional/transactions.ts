@@ -1,5 +1,4 @@
-import { db } from "../db";
-import { NewTransaction, transactionsTable } from "../db/schema.db";
+import { db, NewTransaction, transactionsTable } from "..";
 
 export type InsertResponseType = {
   message: "success" | "duplicate" | "unknown";

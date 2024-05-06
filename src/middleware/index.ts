@@ -1,18 +1,16 @@
 import { Elysia, t } from "elysia";
 import bearer from "@elysiajs/bearer";
-
-import { db } from "../db";
+import { db, findUserById } from "../repository";
 import { readPemFiles, verifyJWT } from "../utils";
-import { findUserById } from "../repository/user.repository";
 
-export const loadTransactionTypes = new Elysia().state(
+export const useTransactionTypes = new Elysia().state(
   "transactionTypes",
   await (async () => {
     return await db.query.transactionTypeTable.findMany();
   })()
 );
 
-export const authenticateUser = new Elysia()
+export const useAuthenticateUser = new Elysia()
   .guard({
     headers: t.Object({
       authorization: t.TemplateLiteral("Bearer ${string}"),
