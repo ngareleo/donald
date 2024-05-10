@@ -1,4 +1,5 @@
-//  NOTE: Please do not include in index file this is exclusive for  bunfig.toml
+//  NOTE: Please do not include in index file. It is exclusive to the bunfig.toml for tests preloading
+
 import { beforeAll, afterAll } from "bun:test";
 import { setupNeonDatabaseConnection, migrateNeonDb } from "~/repository";
 import { seedTransactionTypes } from "~/repository/seed";
@@ -25,6 +26,4 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
-  // global teardown
-});
+afterAll(async () => {});

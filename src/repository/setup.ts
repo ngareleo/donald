@@ -5,16 +5,14 @@ import { drizzle as NeonDrizzle } from "drizzle-orm/neon-http";
 import { migrate as NeonMigrator } from "drizzle-orm/neon-http/migrator";
 import { migrate as PostgresJSMigrator } from "drizzle-orm/postgres-js/migrator";
 import * as schema from "./schema";
-import { EnvVars } from "~/types";
+import { loadConfigs } from "~/config";
 
-const testingDbUrl = process.env.TESTING_DB_URL;
-const localDbUrl = process.env.DB_URL;
-const processEnvironment = process.env.ENV as EnvVars;
-
+const { processEnvironment, testingDbUrl, localDbURL, migrationsFolder } =
+  loadConfigs();
 export type NeonDBType = ReturnType<typeof NeonDrizzle>;
 export type PostgresDBType = ReturnType<typeof PostgresJSDrizzle>;
 
-// Our cache for db connections
+// Cache for db instances
 const connectionsCache = new Map<
   "testingConnection" | "prodConnection",
   NeonDBType | PostgresDBType | undefined
@@ -60,7 +58,7 @@ export function setupNeonDatabaseConnection(): NeonDBType {
  */
 export async function migrateNeonDb() {
   const neonDb = setupNeonDatabaseConnection();
-  await NeonMigrator(neonDb, { migrationsFolder: "supabase/migrations" });
+  await NeonMigrator(neonDb, { migrationsFolder });
   console.info("🎒 Migrations on NeonDB complete!");
 }
 
@@ -76,7 +74,7 @@ export function setupPostgresDatabaseConnection(): PostgresDBType {
     return cachedConnection as unknown as PostgresDBType;
   }
 
-  const postgresDb = PostgresJSDrizzle(postgres(localDbUrl), {
+  const postgresDb = PostgresJSDrizzle(postgres(localDbURL), {
     schema,
   });
   console.info("✅ Connection to Postgres database established");
@@ -90,7 +88,7 @@ export function setupPostgresDatabaseConnection(): PostgresDBType {
  */
 export async function migratePostgresDb() {
   const postDb = setupPostgresDatabaseConnection();
-  await PostgresJSMigrator(postDb, { migrationsFolder: "supabase/migrations" });
+  await PostgresJSMigrator(postDb, { migrationsFolder });
 
   console.info("🎒 Migrations on PostgresJS Db complete");
 }

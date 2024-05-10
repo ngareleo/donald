@@ -90,8 +90,3 @@ export type Transaction =
   | ReceiveMoneyTransaction
   | SendMoneyTransaction
   | WithdrawTransaction;
-
-/**The environment of the current running process. Its controlled by env variables */
-export type Environment = "production" | "development" | "testing";
-
-export type EnvVars = "prod" | "dev" | "test";

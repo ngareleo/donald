@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import bearer from "@elysiajs/bearer";
 import { findUserById, getDatabaseInstance } from "~/repository";
 import { readPemFiles, verifyJWT } from "~/utils";
+import { loadConfigs } from "~/config";
 
 const connection = getDatabaseInstance();
 
@@ -24,6 +25,11 @@ export const useMainApplicationErrorHandling = new Elysia().onError(
         return "Bad Request :(";
     }
   }
+);
+
+export const useApplicationConfigs = new Elysia().state(
+  "config",
+  loadConfigs()
 );
 
 export const useTransactionTypes = new Elysia().state(

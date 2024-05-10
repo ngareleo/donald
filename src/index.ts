@@ -1,31 +1,21 @@
 import App from "./app";
-import { EnvVars } from "~/types";
+import { loadConfigs } from "./config";
 
-declare module "bun" {
-  interface Env {
-    DB_URL: string;
-    TESTING_DB_URL: string;
-    ENV: string;
-  }
-}
-
-const processEnvironment = process.env.ENV as EnvVars;
-const localDbURL = process.env.DB_URL;
-
-if (
-  (processEnvironment === "dev" || processEnvironment === "test") &&
-  !localDbURL
-) {
-  throw Error("Db setting missing!");
-}
+export const ApplicationConfigs = loadConfigs();
+const { processEnvironment, localDbURL } = ApplicationConfigs;
 
 function startApplication() {
+  if (processEnvironment === "dev" && !localDbURL) {
+    console.error("❗️ Missing db configs");
+    process.exit();
+  }
+
   const application = App;
   application.listen(process.env.PORT || 3000);
-  const env = import.meta.env["ENV"];
-  if (env && env === "dev") {
-    console.log(
-      `🦊 Elysia is running at http://${application.server?.hostname}:${application.server?.port}`
+
+  if (processEnvironment === "dev") {
+    console.info(
+      `📶 Elysia is running at http://${application.server?.hostname}:${application.server?.port}`
     );
   }
 }
