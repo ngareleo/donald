@@ -59,3 +59,4 @@ export type NewTag = typeof tagsTable.$inferInsert;
 export type NewTransaction = typeof transactionsTable.$inferInsert;
 export type NewTransactionTag = typeof transactionTagsTable.$inferInsert;
 export type NewUser = typeof usersTable.$inferInsert;
+export type NewTransactionType = typeof transactionTypeTable.$inferInsert;

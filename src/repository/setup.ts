@@ -11,8 +11,8 @@ const testingDbUrl = process.env.TESTING_DB_URL;
 const localDbUrl = process.env.DB_URL;
 const processEnvironment = process.env.ENV as EnvVars;
 
-type NeonDBType = ReturnType<typeof NeonDrizzle>;
-type PostgresDBType = ReturnType<typeof PostgresJSDrizzle>;
+export type NeonDBType = ReturnType<typeof NeonDrizzle>;
+export type PostgresDBType = ReturnType<typeof PostgresJSDrizzle>;
 
 // Our cache for db connections
 const connectionsCache = new Map<
@@ -29,6 +29,10 @@ export function getDatabaseInstance() {
     : setupPostgresDatabaseConnection();
 }
 
+/**
+ * Sets up a connection to the Neon Database
+ * This db is for testing purposes only.
+ */
 export function setupNeonDatabaseConnection(): NeonDBType {
   const testKey = "testingConnection";
 
@@ -41,6 +45,7 @@ export function setupNeonDatabaseConnection(): NeonDBType {
   // missing connection so setting up with Neon Db
   const neonDb = NeonDrizzle(neon(testingDbUrl), {
     schema,
+    logger: true, // Basic logging to the stdout
   });
   console.info("✅ Connection to Neon Db established");
 
@@ -49,6 +54,7 @@ export function setupNeonDatabaseConnection(): NeonDBType {
 }
 
 /**
+ * Runs migrations on Neon db
  * For better perf run in the same process before `setupNeonDatabaseConnection`
  * because we cache the connection and this runs directly
  */
@@ -58,6 +64,10 @@ export async function migrateNeonDb() {
   console.info("🎒 Migrations on NeonDB complete!");
 }
 
+/**
+ * Sets up a connection to `DB_URL` using PostgresJS.
+ * Currently used for prod, dev
+ */
 export function setupPostgresDatabaseConnection(): PostgresDBType {
   const prodKey = "prodConnection";
 
@@ -75,9 +85,12 @@ export function setupPostgresDatabaseConnection(): PostgresDBType {
   return connectionsCache.get(prodKey) as unknown as PostgresDBType;
 }
 
+/**
+ * Runs migrations on the PostgresJS Database
+ */
 export async function migratePostgresDb() {
   const postDb = setupPostgresDatabaseConnection();
   await PostgresJSMigrator(postDb, { migrationsFolder: "supabase/migrations" });
 
-  console.info("🎒 Migrations on PostgresJS Db complete!");
+  console.info("🎒 Migrations on PostgresJS Db complete");
 }
