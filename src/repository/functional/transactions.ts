@@ -1,4 +1,4 @@
-import { db, NewTransaction, transactionsTable } from "..";
+import { getDatabaseInstance, NewTransaction, transactionsTable } from "..";
 
 export type InsertResponseType = {
   message: "success" | "duplicate" | "unknown";
@@ -10,6 +10,8 @@ export type InsertResponseType = {
   };
   payload?: NewTransaction;
 };
+
+const dbInstance = getDatabaseInstance();
 
 export const insertNewTransactions = async (transactions: NewTransaction[]) => {
   const insertTimingKey = `inserting ${transactions.length} transactions`;
@@ -58,7 +60,7 @@ async function insert(
   /// Inserts a single transaction and returns partial of the value
   var newTransaction;
   try {
-    newTransaction = await db
+    newTransaction = await dbInstance!
       .insert(transactionsTable)
       .values(transaction)
       .returning({

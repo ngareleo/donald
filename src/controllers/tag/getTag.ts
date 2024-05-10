@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
-import { useAuthenticateUser, useTransactionTypes } from "../../middleware";
-import { getTagById } from "../../repository";
+import { useAuthenticateUser, useTransactionTypes } from "~/hooks";
+import { getTagById } from "~/repository";
 
 export const GetTag = new Elysia()
   .use(useAuthenticateUser)

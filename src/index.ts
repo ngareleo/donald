@@ -1,19 +1,33 @@
-import { Elysia } from "elysia";
-import { logger } from "@grotto/logysia";
-import UsersController from "./controllers/user/@main";
-import UploadController from "./controllers/upload/@main";
-import TagsController from "./controllers/tag/@main";
-import { useMainApplicationErrorHandling } from "./utils";
+import App from "./app";
+import { EnvVars } from "~/types";
 
-const app = new Elysia()
-  .use(logger({ logIP: true }))
-  .use(useMainApplicationErrorHandling)
-  .get("/", () => "Hello Traveller!")
-  .use(UsersController)
-  .use(UploadController)
-  .use(TagsController)
-  .listen(process.env.PORT || 3000);
+declare module "bun" {
+  interface Env {
+    DB_URL: string;
+    TESTING_DB_URL: string;
+    ENV: string;
+  }
+}
 
-console.log(
-  `🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`
-);
+const processEnvironment = process.env.ENV as EnvVars;
+const localDbURL = process.env.DB_URL;
+
+if (
+  (processEnvironment === "dev" || processEnvironment === "test") &&
+  !localDbURL
+) {
+  throw Error("Db setting missing!");
+}
+
+function startApplication() {
+  const application = App;
+  application.listen(process.env.PORT || 3000);
+  const env = import.meta.env["ENV"];
+  if (env && env === "dev") {
+    console.log(
+      `🦊 Elysia is running at http://${application.server?.hostname}:${application.server?.port}`
+    );
+  }
+}
+
+startApplication();

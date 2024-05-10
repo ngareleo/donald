@@ -1,6 +1,6 @@
 import Elysia from "elysia";
-import { readPemFiles } from "../../utils";
 import bearer from "@elysiajs/bearer";
+import { readPemFiles } from "~/utils";
 
 export const useGlobalUserControllerPlugins = new Elysia()
   .use(bearer())

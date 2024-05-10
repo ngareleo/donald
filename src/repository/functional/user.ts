@@ -1,18 +1,20 @@
 import { eq } from "drizzle-orm";
-import { db, usersTable, type NewUser } from "..";
+import { getDatabaseInstance, usersTable, type NewUser } from "..";
 
-type PublicUser = Required<Omit<NewUser, "password">>;
-type FindUserResponse =
+export type PublicUser = Required<Omit<NewUser, "password">>;
+export type FindUserResponse =
   | PublicUser
   | "something_went_wrong"
   | "user_not_found"
   | "incorrect_password";
 
+const dbInstance = getDatabaseInstance();
+
 export const insertUser = async (
   newUser: NewUser
 ): Promise<PublicUser | null> => {
   const hash = Bun.password.hashSync(newUser.password);
-  const res = await db
+  const res = await dbInstance!
     .insert(usersTable)
     .values({ ...newUser, password: hash })
     .returning({
@@ -33,7 +35,7 @@ export const findUserByUsername = async (
 ): Promise<FindUserResponse> => {
   console.log(subject, usersPassword);
 
-  const lookup = await db
+  const lookup = await dbInstance!
     .select({
       id: usersTable.id,
       username: usersTable.username,
@@ -58,7 +60,7 @@ export const findUserByUsername = async (
 };
 
 export const findUserById = async (id: number) => {
-  const res = await db
+  const res = await dbInstance!
     .select({
       id: usersTable.id,
       username: usersTable.username,
@@ -73,4 +75,11 @@ export const findUserById = async (id: number) => {
     return null;
   }
   return res[0];
+};
+
+export const deleteUser = async (id: number) => {
+  return await dbInstance!
+    .delete(usersTable)
+    .where(eq(usersTable.id, id))
+    .returning();
 };

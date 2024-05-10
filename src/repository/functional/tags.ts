@@ -1,16 +1,19 @@
 import { and, eq } from "drizzle-orm";
 import {
-  db,
   transactionTagsTable,
   transactionsTable,
   tagsTable,
+  getDatabaseInstance,
   type NewTag,
   type NewTransactionTag,
 } from "..";
 
+const dbInstance = getDatabaseInstance();
+
 export const insertNewTag = async (payload: NewTag | NewTag[]) => {
   const pa = Array.isArray(payload) ? payload : [payload];
-  return await db.insert(tagsTable).values(pa).returning({
+  // ignore the error below
+  return await dbInstance!.insert(tagsTable).values(pa).returning({
     id: tagsTable.id,
     name: tagsTable.name,
     description: tagsTable.description,
@@ -18,15 +21,19 @@ export const insertNewTag = async (payload: NewTag | NewTag[]) => {
 };
 
 export const linkTagToTransaction = async (payload: NewTransactionTag) => {
-  return await db.insert(transactionTagsTable).values(payload).returning({
-    id: transactionTagsTable.id,
-    tagId: transactionTagsTable.tagId,
-    transactionId: transactionTagsTable.transactionId,
-  });
+  // ignore the error below
+  return await dbInstance!
+    .insert(transactionTagsTable)
+    .values(payload)
+    .returning({
+      id: transactionTagsTable.id,
+      tagId: transactionTagsTable.tagId,
+      transactionId: transactionTagsTable.transactionId,
+    });
 };
 
 export const getAllUserTags = async (userId: number) => {
-  return await db
+  return await dbInstance!
     .select()
     .from(tagsTable)
     .where(eq(tagsTable.userId, userId))
@@ -43,7 +50,7 @@ export const getAllUserTags = async (userId: number) => {
 export const getTagById = async (userId: number, tagId: Array<number>) => {
   return await Promise.all(
     tagId.map(async (id) => {
-      return await db
+      return await dbInstance!
         .select()
         .from(tagsTable)
         .where(and(eq(tagsTable.userId, userId), eq(tagsTable.id, id)))

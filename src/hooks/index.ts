@@ -1,12 +1,35 @@
 import { Elysia, t } from "elysia";
 import bearer from "@elysiajs/bearer";
-import { db, findUserById } from "../repository";
-import { readPemFiles, verifyJWT } from "../utils";
+import { findUserById, getDatabaseInstance } from "~/repository";
+import { readPemFiles, verifyJWT } from "~/utils";
+
+const connection = getDatabaseInstance();
+
+export const useMainApplicationErrorHandling = new Elysia().onError(
+  ({ code, error, set }) => {
+    if (code === "VALIDATION") {
+    }
+    console.error(error);
+    switch (code) {
+      case "NOT_FOUND":
+        set.status = 404;
+        return "Not Found :(";
+
+      case "INTERNAL_SERVER_ERROR":
+        set.status = 500;
+        return "Internal Server Error :(";
+
+      default:
+        set.status = 400;
+        return "Bad Request :(";
+    }
+  }
+);
 
 export const useTransactionTypes = new Elysia().state(
   "transactionTypes",
   await (async () => {
-    return await db.query.transactionTypeTable.findMany();
+    return await connection!.query.transactionTypeTable.findMany();
   })()
 );
 

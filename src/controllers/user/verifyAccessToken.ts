@@ -1,6 +1,6 @@
 import Elysia from "elysia";
-import { verifyJWT } from "../../utils";
-import { useGlobalUserControllerPlugins } from "./utils";
+import { verifyJWT } from "~/utils";
+import { useGlobalUserControllerPlugins } from ".";
 
 export const VerifyAccessToken = new Elysia()
   .use(useGlobalUserControllerPlugins)
