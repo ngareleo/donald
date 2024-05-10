@@ -21,7 +21,6 @@
   "dependencies": {
     "@elysiajs/bearer": "^0.8.0",
     "@elysiajs/eden": "^1.0.13",
-    "@grotto/logysia": "^0.1.1",
     "drizzle-orm": "^0.29.3",
     "elysia": "latest",
     "elysia-rate-limit": "^2.0.1",
