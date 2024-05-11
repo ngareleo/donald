@@ -34,8 +34,7 @@ export const makeNeonTestingBranchDB = async ({
   const res = await NeonAPIRequest({ method: "post", url, apiKey });
 
   if (res.status !== 200) {
-    console.error("❗️ Couldn't create Neon DB for testing");
-    process.exit(-1);
+    throw Error(await res.text());
   }
   return (await res.json()) as NeonDB;
 };
@@ -45,8 +44,7 @@ export const loadNeonProject = async ({ apiKey }: { apiKey: string }) => {
   const res = await NeonAPIRequest({ method: "get", url, apiKey });
 
   if (res.status !== 200) {
-    console.error("❗️ Couldn't load Neon project");
-    process.exit(-1);
+    throw Error(await res.text());
   }
 
   const [project] = (await res.json()) as Array<NeonProject>;
@@ -69,8 +67,7 @@ export const destroyNeonTestingBranchDB = async ({
   const res = await NeonAPIRequest({ method: "delete", url, apiKey });
 
   if (res.status !== 200) {
-    console.error("❗️ Couldn't create Neon DB for testing");
-    process.exit(-1);
+    throw Error(await res.text());
   }
   return (await res.json()) as DeletedDatabase;
 };

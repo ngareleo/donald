@@ -29,13 +29,25 @@ let mapesaProject: NeonProject | undefined;
 
 beforeAll(async () => {
   // Load the Mapesa project from Neon
-  mapesaProject = await loadNeonProject({ apiKey: neonApiKey! });
+  mapesaProject = await loadNeonProject({ apiKey: neonApiKey! }).catch((e) => {
+    console.error(
+      `❗️ Couldn't load the Neon project! Stopping tests\n${JSON.stringify(e)}`
+    );
+    process.exit(-1);
+  });
 
   // We create a branch ID inside the project
   neonDB = await makeNeonTestingBranchDB({
     apiKey: neonApiKey!,
     branchID,
-    projectID: mapesaProject?.id,
+    projectID: mapesaProject?.id || "",
+  }).catch((e) => {
+    console.error(
+      `❗️ Couldn't create a Neon DB for testing! Stopping tests\n${JSON.stringify(
+        e
+      )}`
+    );
+    process.exit(-1);
   });
 
   // connect to the database
