@@ -1,5 +1,5 @@
 import Elysia from "elysia";
-import { getJWT } from "~/utils";
+import { getJWT } from "~/utils/jwt";
 import { findUserByUsername } from "~/repository";
 import { Returns, UserLoginDTO } from "./authenticateUser.meta";
 import { useGlobalUserControllerPlugins } from ".";

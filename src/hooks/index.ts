@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import bearer from "@elysiajs/bearer";
 import { findUserById, getDatabaseInstance } from "~/repository";
-import { readPemFiles, verifyJWT } from "~/utils";
+import { readPemFiles, verifyJWT } from "~/utils/jwt";
 import { loadConfigs } from "~/config";
 
 const connection = getDatabaseInstance();
