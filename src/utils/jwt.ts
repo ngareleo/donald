@@ -1,15 +1,37 @@
 import * as jose from "jose";
 import type { JWTPayload } from "jose";
-import { findUserById } from "../repository";
+import { findUserById } from "~/repository";
 
-export const readPemFiles = async () => {
+export type VerifyJWTResponse =
+  | "Invalid"
+  | "Expired"
+  | "User not found"
+  | JWTPayload;
+
+export type UploadTransactionDTO = {
+  agentNumber?: string | null;
+  balance: number;
+  dateTime: string;
+  interest?: number;
+  location: string | null;
+  messageId: string;
+  transactionCode: string;
+  transactionAmount: number;
+  subject: string | null;
+  subjectPhoneNumber?: string | null;
+  subjectAccount: string | null;
+  transactionCost: number | null;
+  type: string;
+};
+
+export async function readPemFiles() {
   return {
     publicKey: await Bun.file("./temp/public_key.pem").text(),
     privateKey: await Bun.file("./temp/private_key.pem").text(),
   };
-};
+}
 
-export const getJWT = async (privateKey: string, userId: string) => {
+export async function getJWT(privateKey: string, userId: string) {
   const pk = await jose.importPKCS8(privateKey, "RS256");
   const jwt = await new jose.SignJWT()
     .setProtectedHeader({ alg: "RS256" })
@@ -18,18 +40,12 @@ export const getJWT = async (privateKey: string, userId: string) => {
     .setExpirationTime("2h")
     .sign(pk);
   return jwt;
-};
+}
 
-export type VerifyJWTResponse =
-  | "Invalid"
-  | "Expired"
-  | "User not found"
-  | JWTPayload;
-
-export const verifyJWT = async (
+export async function verifyJWT(
   publicKey: string,
-  token: string
-): Promise<VerifyJWTResponse> => {
+  token: string,
+): Promise<VerifyJWTResponse> {
   const pk = await jose.importSPKI(publicKey, "RS256");
   var payload;
 
@@ -54,20 +70,4 @@ export const verifyJWT = async (
   }
 
   return payload;
-};
-
-export type UploadTransactionDTO = {
-  agentNumber?: string | null;
-  balance: number;
-  dateTime: string;
-  interest?: number;
-  location: string | null;
-  messageId: string;
-  transactionCode: string;
-  transactionAmount: number;
-  subject: string | null;
-  subjectPhoneNumber?: string | null;
-  subjectAccount: string | null;
-  transactionCost: number | null;
-  type: string;
-};
+}

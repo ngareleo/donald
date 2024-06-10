@@ -1,15 +1,15 @@
 import Elysia from "elysia";
-import { verifyJWT } from "../../utils";
-import { useGlobalUserControllerPlugins } from "./utils";
+import bearer from "@elysiajs/bearer";
+import { verifyJWT, readPemFiles } from "~/utils/jwt";
 
 export const VerifyAccessToken = new Elysia()
-  .use(useGlobalUserControllerPlugins)
+  .use(bearer())
+  .state("keys", readPemFiles)
   .get("/verify", async ({ bearer, set, store: { keys } }) => {
     if (!bearer) {
       set.status = 400;
-      set.headers[
-        "WWW-Authenticate"
-      ] = `Bearer realm='sign', error="invalid_request"`;
+      set.headers["WWW-Authenticate"] =
+        `Bearer realm='sign', error="invalid_request"`;
 
       return "FAIL";
     }
@@ -19,9 +19,8 @@ export const VerifyAccessToken = new Elysia()
 
     if (typeof payload === "string") {
       set.status = 400;
-      set.headers[
-        "WWW-Authenticate"
-      ] = `Bearer realm='sign', error="invalid_token"`;
+      set.headers["WWW-Authenticate"] =
+        `Bearer realm='sign', error="invalid_token"`;
       switch (payload) {
         case "Invalid":
         case "Expired":

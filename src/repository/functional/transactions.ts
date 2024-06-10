@@ -1,4 +1,4 @@
-import { db, NewTransaction, transactionsTable } from "..";
+import { getDatabaseInstance, NewTransaction, transactionsTable } from "..";
 
 export type InsertResponseType = {
   message: "success" | "duplicate" | "unknown";
@@ -11,14 +11,16 @@ export type InsertResponseType = {
   payload?: NewTransaction;
 };
 
-export const insertNewTransactions = async (transactions: NewTransaction[]) => {
+const dbInstance = getDatabaseInstance();
+
+export async function insertNewTransactions(transactions: NewTransaction[]) {
   const insertTimingKey = `inserting ${transactions.length} transactions`;
 
   console.time(insertTimingKey);
   const res = await Promise.all(
     transactions.map(async (transaction) => {
       return await insert(transaction);
-    })
+    }),
   );
   console.timeEnd(insertTimingKey);
 
@@ -50,15 +52,15 @@ export const insertNewTransactions = async (transactions: NewTransaction[]) => {
     duplicates,
     failed,
   };
-};
+}
 
 async function insert(
-  transaction: NewTransaction
+  transaction: NewTransaction,
 ): Promise<InsertResponseType> {
   /// Inserts a single transaction and returns partial of the value
   var newTransaction;
   try {
-    newTransaction = await db
+    newTransaction = await dbInstance!
       .insert(transactionsTable)
       .values(transaction)
       .returning({

@@ -1,18 +1,18 @@
 import { eq } from "drizzle-orm";
-import { db, usersTable, type NewUser } from "..";
+import { getDatabaseInstance, usersTable, type NewUser } from "..";
 
-type PublicUser = Required<Omit<NewUser, "password">>;
-type FindUserResponse =
+export type PublicUser = Required<Omit<NewUser, "password">>;
+export type FindUserResponse =
   | PublicUser
   | "something_went_wrong"
   | "user_not_found"
   | "incorrect_password";
 
-export const insertUser = async (
-  newUser: NewUser
-): Promise<PublicUser | null> => {
+const dbInstance = getDatabaseInstance();
+
+export async function insertUser(newUser: NewUser): Promise<PublicUser | null> {
   const hash = Bun.password.hashSync(newUser.password);
-  const res = await db
+  const res = await dbInstance!
     .insert(usersTable)
     .values({ ...newUser, password: hash })
     .returning({
@@ -25,15 +25,13 @@ export const insertUser = async (
     });
 
   return res ? res[0] : null;
-};
+}
 
-export const findUserByUsername = async (
+export async function findUserByUsername(
   subject: string,
-  usersPassword: string
-): Promise<FindUserResponse> => {
-  console.log(subject, usersPassword);
-
-  const lookup = await db
+  usersPassword: string,
+): Promise<FindUserResponse> {
+  const lookup = await dbInstance!
     .select({
       id: usersTable.id,
       username: usersTable.username,
@@ -55,10 +53,10 @@ export const findUserByUsername = async (
   }
   const { password, ...publicUser } = lookup[0];
   return publicUser as PublicUser;
-};
+}
 
-export const findUserById = async (id: number) => {
-  const res = await db
+export async function findUserById(id: number) {
+  const res = await dbInstance!
     .select({
       id: usersTable.id,
       username: usersTable.username,
@@ -73,4 +71,11 @@ export const findUserById = async (id: number) => {
     return null;
   }
   return res[0];
-};
+}
+
+export async function deleteUser(id: number) {
+  return await dbInstance!
+    .delete(usersTable)
+    .where(eq(usersTable.id, id))
+    .returning();
+}
