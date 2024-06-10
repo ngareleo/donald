@@ -40,12 +40,12 @@ export function getDatabaseInstance() {
  */
 export function setupNeonDatabaseConnection(args?: {
   overrideURL?: string;
-  key?: CacheDBKeyType;
+  cacheKey?: CacheDBKeyType;
 }): NeonDBType {
-  const testKey = "testingConnection";
+  const key = args?.cacheKey || "testingConnection";
 
   // Look into cache for open connection
-  const cachedConnection = connectionsCache.get(args?.key || testKey);
+  const cachedConnection = connectionsCache.get(key);
   if (cachedConnection) {
     return cachedConnection as unknown as NeonDBType; // I know more than you typescript butt out!
   }
@@ -59,8 +59,8 @@ export function setupNeonDatabaseConnection(args?: {
 
   console.info("✅ Connection to Neon Db established");
 
-  connectionsCache.set(testKey, neonDb);
-  return connectionsCache.get(testKey) as unknown as NeonDBType; // I know more than you typescript butt out!
+  connectionsCache.set(key, neonDb);
+  return connectionsCache.get(key) as unknown as NeonDBType; // I know more than you typescript butt out!
 }
 
 /**
@@ -74,7 +74,7 @@ export async function migrateNeonDb(args?: {
 }) {
   const neonDb = setupNeonDatabaseConnection({
     overrideURL: args?.overrideURL,
-    key: args?.key,
+    cacheKey: args?.key,
   });
   await NeonMigrator(neonDb, { migrationsFolder });
   console.info("🎒 Migrations on NeonDB complete!");

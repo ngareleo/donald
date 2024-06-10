@@ -1,6 +1,11 @@
-import { CreatedBranchResponse, DeletedDatabase, NeonProject } from "./types";
+import {
+  CreatedBranchResponse,
+  DeletedBranchResponse,
+  GetBranchesResponse,
+  NeonProject,
+} from "./types";
 
-const NEON_API_BASE_URL = "https://console.neon.tech/api/v2/";
+const NEON_API_BASE_URL = "https://console.neon.tech/api/v2";
 const NEON_TEST_BRANCH_ID = "br-late-base-a21oviy0";
 
 export async function NeonAPIRequest(args: {
@@ -24,27 +29,22 @@ export async function NeonAPIRequest(args: {
   });
 }
 
-export async function createNeonBranch(args: {
-  id: string;
-  name: string;
-  apiKey: string;
-}) {
-  const { id, name, apiKey } = args;
+export async function createNeonBranch(args: { id: string; apiKey: string }) {
+  const { id, apiKey } = args;
   const url = `${NEON_API_BASE_URL}/projects/${id}/branches`;
   const res = await NeonAPIRequest({
     method: "POST",
     url,
     apiKey,
     payload: {
-      branch: { parent_id: NEON_TEST_BRANCH_ID, name },
+      branch: { parent_id: NEON_TEST_BRANCH_ID },
       endpoints: [{ type: "read_write" }],
     },
   });
 
   const resPayload = await res.json();
-  console.log("res ", resPayload);
-  if (res.status !== 200 || !resPayload) {
-    throw Error(resPayload ? "No payload" : await res.text());
+  if (res.status != 201 || !resPayload) {
+    throw Error(resPayload);
   }
 
   return resPayload as CreatedBranchResponse;
@@ -78,14 +78,40 @@ export async function destroyNeonTestingBranchDB(args: {
   project: string;
   branch: string;
   apiKey: string;
-  name: string;
 }) {
-  const { project, branch, apiKey, name } = args;
-  const url = `${NEON_API_BASE_URL}/projects/${project}/branches/${branch}/databases/${name}`;
-  const res = await NeonAPIRequest({ method: "DELETE", url, apiKey });
+  const url = `${NEON_API_BASE_URL}/projects/${args.project}/branches/${args.branch}`;
+  const res = await NeonAPIRequest({
+    method: "DELETE",
+    url,
+    apiKey: args.apiKey,
+  });
+  const payload = await res.json();
 
-  if (res.status !== 200) {
-    throw Error(await res.text());
+  if (res.status !== 200 || !payload) {
+    console.error("delete branches", payload);
+    throw Error(payload);
   }
-  return (await res.json()) as DeletedDatabase;
+
+  return payload as DeletedBranchResponse;
+}
+
+export async function getAllBranches(args: {
+  project: string;
+  apiKey: string;
+}) {
+  const url = `${NEON_API_BASE_URL}/projects/${args.project}/branches}`;
+
+  const res = await NeonAPIRequest({
+    method: "GET",
+    url,
+    apiKey: args.apiKey,
+  });
+  const payload = await res.json();
+
+  if (res.status !== 200 || !payload) {
+    console.error("get branches : ", payload);
+    throw Error(payload);
+  }
+
+  return payload as GetBranchesResponse;
 }
