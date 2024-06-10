@@ -1,19 +1,23 @@
-import { Elysia } from "elysia";
-import { logger } from "@grotto/logysia";
-import UsersController from "./controllers/user/@main";
-import UploadController from "./controllers/upload/@main";
-import TagsController from "./controllers/tag/@main";
-import { useMainApplicationErrorHandling } from "./utils";
+import App from "./app";
+import { loadConfigs } from "./config";
 
-const app = new Elysia()
-  .use(logger({ logIP: true }))
-  .use(useMainApplicationErrorHandling)
-  .get("/", () => "Hello Traveller!")
-  .use(UsersController)
-  .use(UploadController)
-  .use(TagsController)
-  .listen(process.env.PORT || 3000);
+export const ApplicationConfigs = loadConfigs();
+const { processEnvironment, localDbURL } = ApplicationConfigs;
 
-console.log(
-  `🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`
-);
+const startApplication = () => {
+  if (processEnvironment === "dev" && !localDbURL) {
+    console.error("❗️ Missing db configs");
+    process.exit();
+  }
+
+  const application = App;
+  application.listen(process.env.PORT || 3000);
+
+  if (processEnvironment === "dev") {
+    console.info(
+      `📶 Elysia is running at http://${application.server?.hostname}:${application.server?.port}`,
+    );
+  }
+};
+
+startApplication();

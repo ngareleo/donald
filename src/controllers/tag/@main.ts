@@ -1,10 +1,8 @@
-import { Elysia, t } from "elysia";
-import { CreateTag } from "./createTag";
-import { GetTag } from "./getTag";
-import { LinkTagToTransaction } from "./linkTagToTransaction";
+import { Elysia } from "elysia";
+import { CreateTag, GetTag, LinkTagToTransaction } from ".";
 
 const TagController = new Elysia().group("/tag", (app) =>
   app.use(CreateTag).use(GetTag).use(LinkTagToTransaction)
 );
 
-export default TagController ;
+export default TagController;

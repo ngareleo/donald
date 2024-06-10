@@ -1,14 +1,15 @@
 import Elysia from "elysia";
-import { getJWT } from "../../utils";
-import { findUserByUsername } from "../../repository";
-import { UserLoginDTO } from "./authenticateUser.meta";
-import { useGlobalUserControllerPlugins } from "./utils";
+import bearer from "@elysiajs/bearer";
+import { readPemFiles, getJWT } from "~/utils/jwt";
+import { findUserByUsername } from "~/repository";
+import { Returns, UserLoginDTO } from "./authenticateUser.meta";
 
 export const AuthenticateUser = new Elysia()
-  .use(useGlobalUserControllerPlugins)
+  .use(bearer())
+  .state("keys", readPemFiles)
   .post(
     "/sign-in",
-    async ({ body, set, store: { keys } }) => {
+    async ({ body, set, store: { keys } }): Promise<Returns> => {
       const { subject, password } = body;
       if (!subject) {
         set.status = 400;
@@ -24,9 +25,12 @@ export const AuthenticateUser = new Elysia()
 
       const { privateKey } = await keys();
       const token = await getJWT(privateKey, String(response.id));
-      return { ...response, token };
+      return { user: response, token, message: "OK" };
     },
     {
       body: UserLoginDTO,
-    }
+      beforeHandle({ request: { body } }) {
+        console.log("[info] Body received ++> ", body);
+      },
+    },
   );
