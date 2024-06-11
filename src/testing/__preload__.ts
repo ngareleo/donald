@@ -11,9 +11,12 @@ import {
   CreatedBranchResponse,
   applyNeonTemplate,
 } from "~/repository/neon";
+import { authTemplate } from "./authTestingTemplate";
 
+// TODO: Allow tests to run without network
+// TODO: Reuse this work to setup our dev flow
 // load env var from .env
-const { neonApiKey, processEnvironment, neonDBConnectionTemplate } =
+const { neonApiKey, processEnvironment, neonDBConnectionTemplate, verbose } =
   loadConfigs();
 
 if (!neonApiKey || !neonDBConnectionTemplate) {
@@ -21,25 +24,26 @@ if (!neonApiKey || !neonDBConnectionTemplate) {
   process.exit(-1);
 }
 
+const { preload } = authTemplate();
 // Run post and pre
 const { setup, cleanup } = usePreload({
   env: processEnvironment,
   apiKey: neonApiKey,
+  verbose,
 });
 
 beforeAll(setup);
 afterAll(cleanup);
 
-/** Sets up testing environment before tests
+/**
+    Sets up testing environment before tests
     and cleans up after running tests consistently even after failure
 */
-function usePreload(args: { apiKey: string; env: EnvVars }) {
-  const { apiKey, env } = args;
+function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
+  const { apiKey, env, verbose } = args;
   let branch: CreatedBranchResponse | undefined;
   let mapesaProject: NeonProject | undefined | null;
 
-  // TODO: Allow tests to run without network
-  // TODO: Reuse this work to setup our dev flow
   const cleanup = async () => {
     // delete the database
     const info = await destroyNeonTestingBranchDB({
@@ -49,8 +53,7 @@ function usePreload(args: { apiKey: string; env: EnvVars }) {
     }).catch((e) => {
       console.error(`❗️ Couldn't cleanup the Neon DB!\n${JSON.stringify(e)}`);
     });
-    console.info("✅ Cleanup successful. Cleanup info\n", info);
-    console.info("✅ Tests completed");
+    console.info("✅ Cleanup successful. Cleanup info\n", verbose ? info : "");
   };
 
   const setup = async () => {
@@ -58,6 +61,7 @@ function usePreload(args: { apiKey: string; env: EnvVars }) {
     console.log("🔗 Pre-test cleanups executing");
 
     // Load the Mapesa project from Neon
+    // TODO: Read from neon-cache.json
     mapesaProject = await loadNeonProject({ apiKey: apiKey! }).catch((e) => {
       console.error(
         `❗️ Couldn't load the Neon project! Stopping tests\n${JSON.stringify(e)}`,
@@ -68,7 +72,7 @@ function usePreload(args: { apiKey: string; env: EnvVars }) {
 
     console.info(
       "🐳 Mapesa project loaded \n",
-      env != "ci" ? mapesaProject : "", // hide this log in ci to avoid data leak
+      verbose && env != "ci" ? mapesaProject : "", // hide this log in ci to avoid data leak
     );
 
     // We create a branch ID inside the project
@@ -85,7 +89,7 @@ function usePreload(args: { apiKey: string; env: EnvVars }) {
       process.exit(-1);
     });
 
-    console.info("🐳 Branch db setup ", branch);
+    console.info("🐳 Branch db setup ", verbose ? branch : "");
 
     // connect to the database
     const [endpoint] = branch?.endpoints;
@@ -94,10 +98,11 @@ function usePreload(args: { apiKey: string; env: EnvVars }) {
         key: "connection",
         value: endpoint?.host,
       }),
+      cacheKey: "PreloadKey",
     });
 
     // run migrations
-    await migrateNeonDb().catch((e) => {
+    await migrateNeonDb({ cacheKey: "PreloadKey" }).catch((e) => {
       console.error(
         `❗️ Couldn't run migrations on Neon!Tests will continue without seed data. Chance is the data already exists\n${JSON.stringify(
           e,
@@ -111,6 +116,9 @@ function usePreload(args: { apiKey: string; env: EnvVars }) {
         `❗️Couldn't run seed the Neon DB! Tests will continue without seed data. Chance is the data already exists\n${JSON.stringify(e)}`,
       );
     });
+
+    // for auth template to work
+    await preload();
   };
 
   return {

@@ -8,13 +8,12 @@ export type FindUserResponse =
   | "user_not_found"
   | "incorrect_password";
 
-const dbInstance = getDatabaseInstance();
-
-export async function insertUser(newUser: NewUser): Promise<PublicUser | null> {
-  const hash = Bun.password.hashSync(newUser.password);
-  const res = await dbInstance!
+export async function insertUser(user: NewUser): Promise<PublicUser | null> {
+  const db = getDatabaseInstance();
+  const hash = Bun.password.hashSync(user.password);
+  const [res] = await db
     .insert(usersTable)
-    .values({ ...newUser, password: hash })
+    .values({ ...user, password: hash })
     .returning({
       id: usersTable.id,
       username: usersTable.username,
@@ -24,14 +23,15 @@ export async function insertUser(newUser: NewUser): Promise<PublicUser | null> {
       lastModified: usersTable.lastModified,
     });
 
-  return res ? res[0] : null;
+  return res;
 }
 
 export async function findUserByUsername(
   subject: string,
-  usersPassword: string,
+  pass: string,
 ): Promise<FindUserResponse> {
-  const lookup = await dbInstance!
+  const db = getDatabaseInstance();
+  const [res] = await db
     .select({
       id: usersTable.id,
       username: usersTable.username,
@@ -43,20 +43,18 @@ export async function findUserByUsername(
     })
     .from(usersTable)
     .where(eq(usersTable.username, subject)); // should not return more than one user
-
-  if (!lookup) {
-    return "something_went_wrong";
-  } else if (lookup.length === 0) {
+  if (!res) {
     return "user_not_found";
-  } else if (!Bun.password.verifySync(usersPassword, lookup[0].password)) {
+  } else if (!Bun.password.verifySync(pass, res.password)) {
     return "incorrect_password";
   }
-  const { password, ...publicUser } = lookup[0];
+  const { password, ...publicUser } = res;
   return publicUser as PublicUser;
 }
 
 export async function findUserById(id: number) {
-  const res = await dbInstance!
+  const db = getDatabaseInstance();
+  const [res] = await db
     .select({
       id: usersTable.id,
       username: usersTable.username,
@@ -67,15 +65,13 @@ export async function findUserById(id: number) {
     })
     .from(usersTable)
     .where(eq(usersTable.id, id));
-  if (!res || res.length === 0) {
+  if (!res) {
     return null;
   }
-  return res[0];
+  return res;
 }
 
 export async function deleteUser(id: number) {
-  return await dbInstance!
-    .delete(usersTable)
-    .where(eq(usersTable.id, id))
-    .returning();
+  const db = getDatabaseInstance();
+  return await db.delete(usersTable).where(eq(usersTable.id, id)).returning();
 }

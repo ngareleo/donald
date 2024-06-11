@@ -12,4 +12,6 @@ export type Returns = {
   message: string;
 };
 
+export const r = "/sign-in";
+
 export type UserLoginDTOType = Static<typeof UserLoginDTO>;

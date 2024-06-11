@@ -2,13 +2,13 @@ import Elysia from "elysia";
 import bearer from "@elysiajs/bearer";
 import { readPemFiles, getJWT } from "~/utils/jwt";
 import { findUserByUsername } from "~/repository";
-import { Returns, UserLoginDTO } from "./authenticateUser.meta";
+import { Returns, UserLoginDTO, r } from "./authenticateUser.meta";
 
 export const AuthenticateUser = new Elysia()
   .use(bearer())
   .state("keys", readPemFiles)
   .post(
-    "/sign-in",
+    r,
     async ({ body, set, store: { keys } }): Promise<Returns> => {
       const { subject, password } = body;
       if (!subject) {
@@ -17,7 +17,6 @@ export const AuthenticateUser = new Elysia()
       }
 
       const response = await findUserByUsername(subject, password);
-
       if (typeof response === "string") {
         set.status = 400;
         return { message: response };
@@ -29,8 +28,5 @@ export const AuthenticateUser = new Elysia()
     },
     {
       body: UserLoginDTO,
-      beforeHandle({ request: { body } }) {
-        console.log("[info] Body received ++> ", body);
-      },
     },
   );

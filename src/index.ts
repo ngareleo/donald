@@ -1,8 +1,8 @@
 import App from "./app";
 import { loadConfigs } from "./config";
 
-export const ApplicationConfigs = loadConfigs();
-const { processEnvironment, localDbURL } = ApplicationConfigs;
+const config = loadConfigs();
+const { processEnvironment, localDbURL } = config;
 
 const startApplication = () => {
   if (processEnvironment === "dev" && !localDbURL) {
