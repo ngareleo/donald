@@ -12,6 +12,7 @@ export type PostgresDBType = ReturnType<typeof PostgresJSDrizzle>;
 export type DBConnectionType = [
   // add keys here to cache the db and retrieve later
   "CliDBType", // example
+  "PreloadKey"
 ];
 export type CacheDBKeyType =
   | ("testingConnection" | "prodConnection")
@@ -19,8 +20,13 @@ export type CacheDBKeyType =
 
 export type CacheValueType = NeonDBType | PostgresDBType;
 
-const { processEnvironment, testingDbURL, localDbURL, migrationsFolder } =
-  loadConfigs();
+const {
+  processEnvironment,
+  testingDbURL,
+  localDbURL,
+  migrationsFolder,
+  verbose,
+} = loadConfigs();
 
 // Cache for db instances
 const connectionsCache = new Map<CacheDBKeyType, CacheValueType | undefined>();
@@ -28,10 +34,12 @@ const connectionsCache = new Map<CacheDBKeyType, CacheValueType | undefined>();
 /**
  * Creates a database instance, if already invoked, reuses open connection
  */
-export function getDatabaseInstance() {
-  return processEnvironment === "test"
-    ? setupNeonDatabaseConnection()
-    : setupPostgresDatabaseConnection();
+export function getDatabaseInstance(): CacheValueType {
+  if (processEnvironment === "test") {
+    // we look for the preload-cache key
+    return connectionsCache.get("PreloadKey") || setupNeonDatabaseConnection();
+  }
+  return setupPostgresDatabaseConnection();
 }
 
 /**
@@ -43,22 +51,24 @@ export function setupNeonDatabaseConnection(args?: {
   cacheKey?: CacheDBKeyType;
 }): NeonDBType {
   const key = args?.cacheKey || "testingConnection";
+  console.log("Key used ", key);
 
   // Look into cache for open connection
   const cachedConnection = connectionsCache.get(key);
   if (cachedConnection) {
+    console.info("👍 Read from cache");
     return cachedConnection as unknown as NeonDBType; // I know more than you typescript butt out!
   }
 
   // missing connection so setting up with Neon Db
   // use a fallback in the env file if missing override URL to connect to
-  const neonDb = NeonDrizzle(neon(args?.overrideURL || testingDbURL), {
+  const url = args?.overrideURL || testingDbURL;
+  const neonDb = NeonDrizzle(neon(url), {
     schema,
-    logger: true, // Basic logging to the stdout
+    logger: verbose || false, // Basic logging to the stdout
   });
 
-  console.info("✅ Connection to Neon Db established");
-
+  console.info(`✅ New connection to Neon Db established using ${url}`);
   connectionsCache.set(key, neonDb);
   return connectionsCache.get(key) as unknown as NeonDBType; // I know more than you typescript butt out!
 }
@@ -69,12 +79,12 @@ export function setupNeonDatabaseConnection(args?: {
  * because we cache the connection and this runs directly
  */
 export async function migrateNeonDb(args?: {
-  overrideURL: string;
-  key?: CacheDBKeyType;
+  overrideURL?: string;
+  cacheKey?: CacheDBKeyType;
 }) {
   const neonDb = setupNeonDatabaseConnection({
     overrideURL: args?.overrideURL,
-    cacheKey: args?.key,
+    cacheKey: args?.cacheKey,
   });
   await NeonMigrator(neonDb, { migrationsFolder });
   console.info("🎒 Migrations on NeonDB complete!");

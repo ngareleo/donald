@@ -2,7 +2,10 @@ import { Elysia } from "elysia";
 import UsersController from "~/controllers/user/@main";
 import UploadController from "~/controllers/upload/@main";
 import TagsController from "~/controllers/tag/@main";
-import { useApplicationConfigs, useMainApplicationErrorHandling } from "~/hooks";
+import {
+  useApplicationConfigs,
+  useMainApplicationErrorHandling,
+} from "~/hooks";
 
 const greeting = "Hello Traveller!";
 

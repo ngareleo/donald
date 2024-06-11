@@ -8,3 +8,5 @@ export const NewTagDTO = t.Object({
 export type NewTagDTOType = Static<typeof NewTagDTO>;
 
 export const CreateTagDTO = t.Union([NewTagDTO, t.Array(NewTagDTO)]);
+
+export const r = "/";

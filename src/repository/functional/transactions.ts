@@ -11,8 +11,6 @@ export type InsertResponseType = {
   payload?: NewTransaction;
 };
 
-const dbInstance = getDatabaseInstance();
-
 export async function insertNewTransactions(transactions: NewTransaction[]) {
   const insertTimingKey = `inserting ${transactions.length} transactions`;
 
@@ -20,7 +18,7 @@ export async function insertNewTransactions(transactions: NewTransaction[]) {
   const res = await Promise.all(
     transactions.map(async (transaction) => {
       return await insert(transaction);
-    }),
+    })
   );
   console.timeEnd(insertTimingKey);
 
@@ -55,12 +53,13 @@ export async function insertNewTransactions(transactions: NewTransaction[]) {
 }
 
 async function insert(
-  transaction: NewTransaction,
+  transaction: NewTransaction
 ): Promise<InsertResponseType> {
+  const db = getDatabaseInstance();
   /// Inserts a single transaction and returns partial of the value
   var newTransaction;
   try {
-    newTransaction = await dbInstance!
+    newTransaction = await db
       .insert(transactionsTable)
       .values(transaction)
       .returning({

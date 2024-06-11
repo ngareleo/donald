@@ -8,12 +8,11 @@ import {
   type NewTransactionTag,
 } from "..";
 
-const dbInstance = getDatabaseInstance();
-
 export async function insertNewTag(payload: NewTag | NewTag[]) {
+  const db = getDatabaseInstance();
   const pa = Array.isArray(payload) ? payload : [payload];
   // ignore the error below
-  return await dbInstance!.insert(tagsTable).values(pa).returning({
+  return await db.insert(tagsTable).values(pa).returning({
     id: tagsTable.id,
     name: tagsTable.name,
     description: tagsTable.description,
@@ -21,47 +20,47 @@ export async function insertNewTag(payload: NewTag | NewTag[]) {
 }
 
 export async function linkTagToTransaction(payload: NewTransactionTag) {
+  const db = getDatabaseInstance();
   // ignore the error below
-  return await dbInstance!
-    .insert(transactionTagsTable)
-    .values(payload)
-    .returning({
-      id: transactionTagsTable.id,
-      tagId: transactionTagsTable.tagId,
-      transactionId: transactionTagsTable.transactionId,
-    });
+  return await db.insert(transactionTagsTable).values(payload).returning({
+    id: transactionTagsTable.id,
+    tagId: transactionTagsTable.tagId,
+    transactionId: transactionTagsTable.transactionId,
+  });
 }
 
-export async function getAllUserTags(userId: number) {
-  return await dbInstance!
+export async function getAllUserTags(id: number) {
+  const db = getDatabaseInstance();
+  return await db
     .select()
     .from(tagsTable)
-    .where(eq(tagsTable.userId, userId))
+    .where(eq(tagsTable.userId, id))
     .leftJoin(
       transactionTagsTable,
-      eq(tagsTable.id, transactionTagsTable.tagId),
+      eq(tagsTable.id, transactionTagsTable.tagId)
     )
     .leftJoin(
       transactionsTable,
-      eq(transactionTagsTable.transactionId, transactionsTable.id),
+      eq(transactionTagsTable.transactionId, transactionsTable.id)
     );
 }
 
 export async function getTagById(userId: number, tagId: Array<number>) {
+  const db = getDatabaseInstance();
   return await Promise.all(
     tagId.map(async (id) => {
-      return await dbInstance!
+      return await db
         .select()
         .from(tagsTable)
         .where(and(eq(tagsTable.userId, userId), eq(tagsTable.id, id)))
         .leftJoin(
           transactionTagsTable,
-          eq(tagsTable.id, transactionTagsTable.tagId),
+          eq(tagsTable.id, transactionTagsTable.tagId)
         )
         .leftJoin(
           transactionsTable,
-          eq(transactionTagsTable.transactionId, transactionsTable.id),
+          eq(transactionTagsTable.transactionId, transactionsTable.id)
         );
-    }),
+    })
   );
 }

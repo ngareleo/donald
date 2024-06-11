@@ -1,3 +1,5 @@
+import { stringToBoolean } from "~/utils";
+
 /**The environment of the current running process. Its controlled by env variables */
 export type EnvVars = "prod" | "dev" | "test" | "ci";
 
@@ -9,6 +11,7 @@ declare module "bun" {
     MIGRATIONS_FOLDER: string;
     NEON_API_KEY: string;
     NEON_DB_CONNECTION_TEMPLATE: string;
+    VERBOSE: string;
   }
 }
 
@@ -20,6 +23,7 @@ export type ApplicationConfigs = Readonly<
     localDbURL: string;
     testingDbURL: string;
     migrationsFolder: string;
+    verbose: boolean;
   }> &
     Partial<{
       // if its not needed in every environment put here
@@ -27,18 +31,21 @@ export type ApplicationConfigs = Readonly<
       neonDBConnectionTemplate: string;
     }>
 >;
+
 export function loadConfigs(): ApplicationConfigs {
   const processEnvironment = process.env.ENV as EnvVars;
   const localDbURL = process.env.DB_URL;
   const testingDbURL = process.env.TESTING_DB_URL;
   const migrationsFolder = process.env.MIGRATIONS_FOLDER;
   const neonDBConnectionTemplate = process.env.NEON_DB_CONNECTION_TEMPLATE;
+  const verbose = process.env.VERBOSE;
 
   const basic = {
     migrationsFolder,
     processEnvironment,
     localDbURL,
     testingDbURL,
+    verbose: stringToBoolean(verbose),
   };
 
   if (!processEnvironment) {
@@ -53,8 +60,7 @@ export function loadConfigs(): ApplicationConfigs {
       neonDBConnectionTemplate,
     };
 
-    // TODO: hide this info
-    console.info("🌥️ Test env configs ", testConfigs); // only log in local tests for debugging
+    console.info("🌥️ Test env configs loaded ", verbose ? testConfigs : "");
     return testConfigs;
   }
 
