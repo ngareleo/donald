@@ -22,14 +22,14 @@
     "neon:projects-list": "bunx neonctl projects list --output json",
     "start": "bun run src/index.ts --env-file=.env.prod",
     "test": "[ ! -f neon-cache.json ] &&  bun run neon:setup || echo '✅ Cache found' && bun test --env-file=.env.test",
-    "prepare": "husky install",
+    "prepare": "husky",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "prettier": "npx prettier src --write --ignore-unknown"
   },
   "husky": {
-    "hooks":{
-      "pre-commit": "bun prettier && git add -A ." 
+    "hooks": {
+      "pre-commit": "bun prettier && git add -A ."
     }
   },
   "dependencies": {
@@ -64,6 +64,6 @@
     "~": "src"
   },
   "lint-staged": {
-    "*.{js,css,md, ts}": "prettier --write --ignore-unknown"
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
