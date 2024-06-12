@@ -57,7 +57,8 @@
   },
   "lint-staged": {
     "**/*.{js,ts,tsx,json,css,md}": [
-      "prettier src --write --ignore-unknown"
+      "prettier src --write --ignore-unknown",
+      "eslint src"
     ]
   }
 }

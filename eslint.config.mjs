@@ -23,6 +23,8 @@ export default [
       // "no-console": "warn",
       "quotes": ["warn", "double", { "avoidEscape": true, "allowTemplateLiterals": true }],
       "semi": ["error", "always"],
+      "no-unused-vars": ["warn", { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }],
+
     },
   },
 
