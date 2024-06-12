@@ -27,6 +27,11 @@
     "lint:fix": "eslint src --fix",
     "prettier": "npx prettier src --write --ignore-unknown"
   },
+  "husky": {
+    "hooks":{
+      "pre-commit": "bun prettier && git add -A ." 
+    }
+  },
   "dependencies": {
     "@elysiajs/bearer": "^0.8.0",
     "@elysiajs/eden": "^1.0.13",
