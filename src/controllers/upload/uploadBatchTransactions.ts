@@ -18,7 +18,7 @@ export const UploadBatchTransactions = new Elysia()
       const { raw } = body;
       const transactions = raw.map((transaction) => {
         const transactionType = transactionTypes.find(
-          (type) => type.name === transaction.type
+          (type) => type.name === transaction.type,
         );
         if (!transactionType) {
           throw new Error(`Transaction type, ${transactionType}, not found`);
@@ -44,5 +44,5 @@ export const UploadBatchTransactions = new Elysia()
     {
       type: "application/json",
       body: IncomingTransactionPayloadDTO,
-    }
+    },
   );

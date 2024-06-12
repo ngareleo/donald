@@ -37,11 +37,11 @@ export async function getAllUserTags(id: number) {
     .where(eq(tagsTable.userId, id))
     .leftJoin(
       transactionTagsTable,
-      eq(tagsTable.id, transactionTagsTable.tagId)
+      eq(tagsTable.id, transactionTagsTable.tagId),
     )
     .leftJoin(
       transactionsTable,
-      eq(transactionTagsTable.transactionId, transactionsTable.id)
+      eq(transactionTagsTable.transactionId, transactionsTable.id),
     );
 }
 
@@ -55,12 +55,12 @@ export async function getTagById(userId: number, tagId: Array<number>) {
         .where(and(eq(tagsTable.userId, userId), eq(tagsTable.id, id)))
         .leftJoin(
           transactionTagsTable,
-          eq(tagsTable.id, transactionTagsTable.tagId)
+          eq(tagsTable.id, transactionTagsTable.tagId),
         )
         .leftJoin(
           transactionsTable,
-          eq(transactionTagsTable.transactionId, transactionsTable.id)
+          eq(transactionTagsTable.transactionId, transactionsTable.id),
         );
-    })
+    }),
   );
 }

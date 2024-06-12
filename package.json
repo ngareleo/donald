@@ -25,7 +25,7 @@
     "prepare": "husky install",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "prettier": "npx prettier . --check"
+    "prettier": "npx prettier src --write --ignore-unknown"
   },
   "dependencies": {
     "@elysiajs/bearer": "^0.8.0",

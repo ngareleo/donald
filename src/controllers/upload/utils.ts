@@ -10,5 +10,5 @@ export const useUploadsControllerErrorHandling = new Elysia().onError(
       set.status = 500;
       return { message: "Internal server error", error: error.message };
     }
-  }
+  },
 );

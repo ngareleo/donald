@@ -12,7 +12,7 @@ export type PostgresDBType = ReturnType<typeof PostgresJSDrizzle>;
 export type DBConnectionType = [
   // add keys here to cache the db and retrieve later
   "CliDBType", // example
-  "PreloadKey"
+  "PreloadKey",
 ];
 export type CacheDBKeyType =
   | ("testingConnection" | "prodConnection")
