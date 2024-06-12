@@ -21,7 +21,7 @@ export default [
     },
     rules: {
       // "no-console": "warn",
-      "quotes": ["warn", "double"],
+      "quotes": ["warn", "double", { "avoidEscape": true, "allowTemplateLiterals": true }],
       "semi": ["error", "always"],
     },
   },
