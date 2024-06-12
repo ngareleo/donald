@@ -43,3 +43,5 @@ package-lock.json
 **/*.bun
 
 neon-cache.json
+
+docker-compose.yaml

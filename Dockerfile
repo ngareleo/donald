@@ -4,12 +4,12 @@ WORKDIR /usr/src/app
 FROM base AS dev
 RUN mkdir -p /temp/dev
 COPY package.json /temp/dev/
-RUN cd /temp/dev && bun install --force --ignore-scripts && bun run prepare
+RUN cd /temp/dev && bun install --force --ignore-scripts
 
 FROM base AS install
 RUN mkdir -p /temp/prod
 COPY package.json /temp/prod/
-RUN cd /temp/prod && bun install --force --production && bun run prepare
+RUN cd /temp/prod && bun install --force --production
 
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
