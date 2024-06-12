@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 FROM base AS dev
 RUN mkdir -p /temp/dev
 COPY package.json /temp/dev/
-RUN cd /temp/dev && bun install --force --ignore-scripts
+RUN cd /temp/dev && bun install --force --ignore-scripts && bun run prepare
 
 FROM base AS install
 RUN mkdir -p /temp/prod
