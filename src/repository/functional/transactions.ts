@@ -22,7 +22,7 @@ export async function insertNewTransactions(transactions: NewTransaction[]) {
   );
   console.timeEnd(insertTimingKey);
 
-  var allSuccess = true;
+  let allSuccess = true;
   const oks = [];
   const duplicates = [];
   const failed = [];
@@ -57,7 +57,7 @@ async function insert(
 ): Promise<InsertResponseType> {
   const db = getDatabaseInstance();
   /// Inserts a single transaction and returns partial of the value
-  var newTransaction;
+  let newTransaction;
   try {
     newTransaction = await db
       .insert(transactionsTable)

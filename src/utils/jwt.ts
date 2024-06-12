@@ -47,7 +47,7 @@ export async function verifyJWT(
   token: string,
 ): Promise<VerifyJWTResponse> {
   const pk = await jose.importSPKI(publicKey, "RS256");
-  var payload;
+  let payload;
 
   try {
     const { payload: pl } = await jose.jwtVerify<JWTPayload>(token, pk);

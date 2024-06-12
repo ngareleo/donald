@@ -8,7 +8,7 @@ export function authTemplate() {
   let accessToken: string | undefined;
   let userId: string | undefined;
   let createdUser: NewUser | undefined;
-  let user = {
+  const user = {
     email: "testuser3@testaccount.com",
     password: "testPassword3",
     username: "testUser3",
