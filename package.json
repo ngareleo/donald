@@ -24,7 +24,8 @@
     "test": "[ ! -f neon-cache.json ] &&  bun run neon:setup || echo '✅ Cache found' && bun test --env-file=.env.test",
     "prepare": "husky install",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint:fix": "eslint src --fix",
+    "prettier": "npx prettier . --check"
   },
   "dependencies": {
     "@elysiajs/bearer": "^0.8.0",
@@ -58,6 +59,6 @@
     "~": "src"
   },
   "lint-staged": {
-    "*.{js,css,md}": "prettier --write"
+    "*.{js,css,md, ts}": "prettier --write --ignore-unknown"
   }
 }
