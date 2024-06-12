@@ -9,7 +9,7 @@ RUN cd /temp/dev && bun install --force --ignore-scripts && bun run prepare
 FROM base AS install
 RUN mkdir -p /temp/prod
 COPY package.json /temp/prod/
-RUN cd /temp/prod && bun install --force --production
+RUN cd /temp/prod && bun install --force --production && bun run prepare
 
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
