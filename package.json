@@ -21,8 +21,7 @@
     "neon:setup": "bun run neon:auth && bun run neon:projects-list > neon-cache.json",
     "neon:projects-list": "bunx neonctl projects list --output json",
     "start": "bun run src/index.ts --env-file=.env.prod",
-    "test": "[ ! -f neon-cache.json ] &&  bun run neon:setup || echo '✅ Cache found' && bun test --env-file=.env.test",
-    "prepare": "husky"
+    "test": "[ ! -f neon-cache.json ] &&  bun run neon:setup || echo '✅ Cache found' && bun test --env-file=.env.test"
   },
   "dependencies": {
     "@elysiajs/bearer": "^0.8.0",
@@ -31,7 +30,6 @@
     "drizzle-orm": "^0.29.3",
     "elysia": "latest",
     "elysia-rate-limit": "^2.0.1",
-    "husky": "^9.0.11",
     "jose": "^5.2.0",
     "module-alias": "^2.2.3",
     "postgres": "^3.4.3"
@@ -44,6 +42,7 @@
     "drizzle-kit": "^0.20.10",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.4.0",
+    "husky": "^9.0.11",
     "lint-staged": "^15.2.6",
     "neonctl": "^1.30.0",
     "prettier": "3.3.2",
