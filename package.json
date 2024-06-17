@@ -39,7 +39,7 @@
     "@neondatabase/serverless": "^0.9.3",
     "@sinclair/typebox": "^0.32.28",
     "bun-types": "latest",
-    "drizzle-kit": "^0.20.10",
+    "drizzle-kit": "^0.22.7",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.4.0",
     "husky": "^9.0.11",
