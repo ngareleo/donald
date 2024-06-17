@@ -35,15 +35,27 @@
     "postgres": "^3.4.3"
   },
   "devDependencies": {
+    "@eslint/js": "9.4.0",
     "@neondatabase/serverless": "^0.9.3",
     "@sinclair/typebox": "^0.32.28",
     "bun-types": "latest",
     "drizzle-kit": "^0.20.10",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.4.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.6",
     "neonctl": "^1.30.0",
-    "supabase": "^1.127.4"
+    "prettier": "3.3.2",
+    "supabase": "^1.127.4",
+    "typescript-eslint": "^7.13.0"
   },
   "module": "src/index.js",
   "_moduleAliases": {
     "~": "src"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx,json,css,md}": [
+      "prettier src --write --ignore-unknown"
+    ]
   }
 }

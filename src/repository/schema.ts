@@ -51,7 +51,7 @@ export const transactionTagsTable = pgTable("transaction_tags_table", {
   ...defaultFields,
   tagId: integer("tag_id").references(() => tagsTable.id),
   transactionId: integer("transaction_id").references(
-    () => transactionsTable.id
+    () => transactionsTable.id,
   ),
 });
 

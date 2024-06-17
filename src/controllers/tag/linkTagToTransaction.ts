@@ -17,5 +17,5 @@ export const LinkTagToTransaction = new Elysia().use(useAuthenticateUser).post(
   },
   {
     body: LinkItemDTO,
-  }
+  },
 );

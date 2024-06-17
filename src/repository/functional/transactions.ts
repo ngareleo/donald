@@ -18,11 +18,11 @@ export async function insertNewTransactions(transactions: NewTransaction[]) {
   const res = await Promise.all(
     transactions.map(async (transaction) => {
       return await insert(transaction);
-    })
+    }),
   );
   console.timeEnd(insertTimingKey);
 
-  var allSuccess = true;
+  let allSuccess = true;
   const oks = [];
   const duplicates = [];
   const failed = [];
@@ -53,11 +53,11 @@ export async function insertNewTransactions(transactions: NewTransaction[]) {
 }
 
 async function insert(
-  transaction: NewTransaction
+  transaction: NewTransaction,
 ): Promise<InsertResponseType> {
   const db = getDatabaseInstance();
   /// Inserts a single transaction and returns partial of the value
-  var newTransaction;
+  let newTransaction;
   try {
     newTransaction = await db
       .insert(transactionsTable)

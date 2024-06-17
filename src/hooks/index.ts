@@ -24,19 +24,19 @@ export const useMainApplicationErrorHandling = new Elysia().onError(
         set.status = 400;
         return "Bad Request :(";
     }
-  }
+  },
 );
 
 export const useApplicationConfigs = new Elysia().state(
   "config",
-  loadConfigs()
+  loadConfigs(),
 );
 
 export const useTransactionTypes = new Elysia().state(
   "transactionTypes",
   await (async () => {
     return await connection!.query.transactionTypeTable.findMany();
-  })()
+  })(),
 );
 
 export const useAuthenticateUser = new Elysia()
@@ -50,9 +50,8 @@ export const useAuthenticateUser = new Elysia()
   .onBeforeHandle(async ({ bearer, set, store: { keys } }) => {
     if (!bearer) {
       set.status = 401;
-      set.headers[
-        "WWW-Authenticate"
-      ] = `Bearer realm='sign', error="invalid_request"`;
+      set.headers["WWW-Authenticate"] =
+        `Bearer realm='sign', error="invalid_request"`;
 
       return { message: "not_authenticated" };
     }
@@ -62,9 +61,8 @@ export const useAuthenticateUser = new Elysia()
 
     if (typeof payload === "string") {
       set.status = 401;
-      set.headers[
-        "WWW-Authenticate"
-      ] = `Bearer realm='sign', error="invalid_token"`;
+      set.headers["WWW-Authenticate"] =
+        `Bearer realm='sign', error="invalid_token"`;
       switch (payload) {
         case "User not found":
         case "Invalid":

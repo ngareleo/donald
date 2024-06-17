@@ -16,12 +16,12 @@ export const GetTag = new Elysia()
       params: t.Optional(
         t.Object({
           id: t.Number(),
-        })
+        }),
       ),
       body: t.Optional(
         t.Object({
           ids: t.Array(t.Number()),
-        })
+        }),
       ),
-    }
+    },
   );

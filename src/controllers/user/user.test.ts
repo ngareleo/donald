@@ -15,8 +15,8 @@ const user: UserRegisterDTOType = {
 
 // Test the entire controller as a unit
 describe("Test user controller", () => {
-  var created: NewUser | undefined;
-  var accessToken: string | undefined;
+  let created: NewUser | undefined;
+  let accessToken: string | undefined;
   it("should create a user", async () => {
     const request = new Request(`http://localhost${RegisterUserR}`, {
       method: "POST",
