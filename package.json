@@ -9,5 +9,10 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx,json,css,md}": [
+      "prettier packages/donald-backend/src --write --ignore-unknown"
+    ]
   }
 }

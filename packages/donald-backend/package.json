@@ -52,10 +52,5 @@
   "module": "src/index.js",
   "_moduleAliases": {
     "~": "src"
-  },
-  "lint-staged": {
-    "**/*.{js,ts,tsx,json,css,md}": [
-      "prettier src --write --ignore-unknown"
-    ]
   }
 }
