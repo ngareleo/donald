@@ -22,7 +22,7 @@
   },
   "lint-staged": {
     "**/*.{js,ts,tsx,json,css,md}": [
-      "prettier --write --ignore-unknown"
+      "prettier packages/hercules/src --write --ignore-unknown"
     ]
   }
 }
