@@ -1,3 +1,3 @@
-import helloTraveller from 'hercules'
+import helloTraveller from "hercules";
 
-helloTraveller()
+helloTraveller();

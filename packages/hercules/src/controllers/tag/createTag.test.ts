@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "bun:test";
-import { authTemplate } from "../../testing";
+import { authTemplate } from "~/testing";
 import { r, type NewTagDTOType } from "./createTag.meta";
 import { CreateTag } from "./createTag";
 
