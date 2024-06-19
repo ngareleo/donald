@@ -3,16 +3,23 @@
   "module": "index.ts",
   "type": "module",
   "workspaces": ["packages/*"],
+  "scripts": {
+     "clean": "rm -rf node_modules"
+  },
   "devDependencies": {
     "@types/bun": "latest",
-     "donald-backend": "workspace:*"
+     "hercules": "workspace:*",
+     "stark": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx,json,css,md}": [
-      "prettier packages/donald-backend/src --write --ignore-unknown"
+      "eslint packages/hercules/src",
+      "eslint packages/stark/src",
+      "prettier packages/hercules/src --write --ignore-unknown",
+      "prettier packages/stark/src --write --ignore-unknown"
     ]
   }
 }
