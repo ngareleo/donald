@@ -2,17 +2,20 @@
   "name": "donald",
   "module": "index.ts",
   "type": "module",
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-     "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "prepare": "husky && husky install"
   },
   "devDependencies": {
     "@eslint/js": "9.4.0",
     "@types/bun": "latest",
-     "hercules": "workspace:*",
-     "stark": "workspace:*",
-     "neonctl": "^1.30.0",
-     "prettier": "3.3.2"
+    "hercules": "workspace:*",
+    "husky": "^9.0.11",
+    "prettier": "3.3.2",
+    "stark": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
