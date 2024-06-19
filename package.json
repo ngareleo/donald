@@ -16,10 +16,7 @@
   },
   "lint-staged": {
     "**/*.{js,ts,tsx,json,css,md}": [
-      "eslint packages/hercules/src",
-      "eslint packages/stark/src",
-      "prettier packages/hercules/src --write --ignore-unknown",
-      "prettier packages/stark/src --write --ignore-unknown"
+      "prettier packages/donald-backend/src --write --ignore-unknown"
     ]
   }
 }
