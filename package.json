@@ -7,16 +7,19 @@
      "clean": "rm -rf node_modules"
   },
   "devDependencies": {
+    "@eslint/js": "9.4.0",
     "@types/bun": "latest",
      "hercules": "workspace:*",
-     "stark": "workspace:*"
+     "stark": "workspace:*",
+     "neonctl": "^1.30.0",
+     "prettier": "3.3.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx,json,css,md}": [
-      "prettier packages/donald-backend/src --write --ignore-unknown"
+      "prettier --write --ignore-unknown"
     ]
   }
 }
