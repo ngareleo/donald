@@ -28,5 +28,4 @@ startApplication();
 //I think this file can be dedicated for imports and exports if hercules has to relate with the other packages in the monorepo
 import { helloTraveller } from "./hello";
 
-
-export default helloTraveller; 
+export default helloTraveller;

@@ -6,8 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "rm -rf node_modules",
-    "prepare": "husky && husky install"
+    "clean": "rm -rf node_modules"
   },
   "devDependencies": {
     "@eslint/js": "9.4.0",
