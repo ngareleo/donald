@@ -1,11 +1,6 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "hercules": ["packages/hercules/src"],
-      "stark": ["packages/stark/"]
-    },
-
     // Enable latest features
     "lib": ["ESNext", "DOM"],
     "target": "ESNext",
