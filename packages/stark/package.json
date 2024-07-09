@@ -1,0 +1,17 @@
+{
+  "name": "stark",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch index.ts"
+  },
+  "dependencies":{
+    "hercules": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,9 +1,9 @@
 .devcontainer
-,github
+.github
 .vscode
 nodemodules
-supabase
-temp
+supabase/
+temp/
 .dockerfile
 .env
 .gitignore
@@ -13,6 +13,7 @@ bunfig.toml
 Dockerfile
 entrypoint.sh
 package--lock.json
+donald-backenackage.json
+package--lock.json
 package.json
 README.md
-tsconfig,json
