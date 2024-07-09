@@ -14,7 +14,7 @@ export type NeonProject = {
   region_id: string;
   name: string;
   provisioner: string;
-  settings?: any;
+  settings?: unknown;
   pg_version: string;
   proxy_host: string;
   branch_logical_size_limit: number;

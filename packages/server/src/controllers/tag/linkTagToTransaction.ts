@@ -1,4 +1,4 @@
-import Elysia, { t } from "elysia";
+import Elysia from "elysia";
 import { linkTagToTransaction } from "~/repository";
 import { useAuthenticateUser } from "~/hooks";
 import { LinkItemDTO } from "./linkTagToTransaction.meta";

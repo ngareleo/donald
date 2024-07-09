@@ -4,13 +4,11 @@ import { findUserById, getDatabaseInstance } from "~/repository";
 import { readPemFiles, verifyJWT } from "~/utils/jwt";
 import { loadConfigs } from "~/config";
 
-const connection = getDatabaseInstance();
-
 export const useMainApplicationErrorHandling = new Elysia().onError(
   ({ code, error, set }) => {
     if (code === "VALIDATION") {
+      console.error(error);
     }
-    console.error(error);
     switch (code) {
       case "NOT_FOUND":
         set.status = 404;
@@ -35,6 +33,7 @@ export const useApplicationConfigs = new Elysia().state(
 export const useTransactionTypes = new Elysia().state(
   "transactionTypes",
   await (async () => {
+    const connection = getDatabaseInstance();
     return await connection!.query.transactionTypeTable.findMany();
   })(),
 );

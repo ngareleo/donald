@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 import bearer from "@elysiajs/bearer";
 import { verifyJWT, readPemFiles } from "~/utils/jwt";
-import { Returns, r } from "./verifyAccessToken.meta";
+import { type Returns, r } from "./verifyAccessToken.meta";
 
 export const VerifyAccessToken = new Elysia()
   .use(bearer())

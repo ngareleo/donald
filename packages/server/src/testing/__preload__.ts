@@ -1,6 +1,6 @@
 //  NOTE: Please do not include in index file. It is exclusive to the bunfig.toml for tests preloading
 import { afterAll, beforeAll } from "bun:test";
-import { EnvVars, loadConfigs } from "~/config";
+import { type EnvVars, loadConfigs } from "~/config";
 import { setupNeonDatabaseConnection, migrateNeonDb } from "~/repository";
 import { seedTransactionTypes } from "~/repository/seed";
 import {
@@ -8,7 +8,7 @@ import {
   loadNeonProject,
   destroyNeonTestingBranchDB,
   type NeonProject,
-  CreatedBranchResponse,
+  type CreatedBranchResponse,
   applyNeonTemplate,
 } from "~/repository/neon";
 import { authTemplate } from "./authTestingTemplate";
@@ -92,6 +92,7 @@ function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
     console.info("🐳 Branch db setup ", verbose ? branch : "");
 
     // connect to the database
+    // eslint-disable-next-line no-unsafe-optional-chaining
     const [endpoint] = branch?.endpoints;
     const neonDbConnection = setupNeonDatabaseConnection({
       overrideURL: applyNeonTemplate(neonDBConnectionTemplate!, {

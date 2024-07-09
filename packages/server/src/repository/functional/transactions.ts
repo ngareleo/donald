@@ -1,4 +1,8 @@
-import { getDatabaseInstance, NewTransaction, transactionsTable } from "..";
+import {
+  getDatabaseInstance,
+  type NewTransaction,
+  transactionsTable,
+} from "..";
 
 export type InsertResponseType = {
   message: "success" | "duplicate" | "unknown";

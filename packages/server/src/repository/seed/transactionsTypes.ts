@@ -1,7 +1,7 @@
 import {
-  NeonDBType,
-  NewTransactionType,
-  PostgresDBType,
+  type NeonDBType,
+  type NewTransactionType,
+  type PostgresDBType,
   transactionTypeTable,
 } from "~/repository";
 

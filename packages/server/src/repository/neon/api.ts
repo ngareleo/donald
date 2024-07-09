@@ -1,8 +1,8 @@
 import {
-  CreatedBranchResponse,
-  DeletedBranchResponse,
-  GetBranchesResponse,
-  NeonProject,
+  type CreatedBranchResponse,
+  type DeletedBranchResponse,
+  type GetBranchesResponse,
+  type NeonProject,
 } from "./types";
 
 const NEON_API_BASE_URL = "https://console.neon.tech/api/v2";
@@ -12,7 +12,7 @@ export async function NeonAPIRequest(args: {
   method: "POST" | "GET" | "DELETE";
   url: string;
   apiKey: string;
-  payload?: any;
+  payload?: unknown;
   overrideHeaders?: { [key: string]: string };
 }) {
   const headers = {

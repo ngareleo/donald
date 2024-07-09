@@ -1,6 +1,9 @@
 import { describe, expect, it } from "bun:test";
-import { NewUser } from "~/repository";
-import { UserRegisterDTOType, r as RegisterUserR } from "./registerUser.meta";
+import { type NewUser } from "~/repository";
+import {
+  type UserRegisterDTOType,
+  r as RegisterUserR,
+} from "./registerUser.meta";
 import { RegisterUsers } from "./registerUser";
 import { AuthenticateUser } from "./authenticateUser";
 import { r as AuthenticateUserR } from "./authenticateUser.meta";

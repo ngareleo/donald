@@ -2,7 +2,7 @@ import Elysia from "elysia";
 import bearer from "@elysiajs/bearer";
 import { readPemFiles } from "~/utils/jwt";
 import { insertUser } from "~/repository";
-import { Returns, r, UserRegisterDTO } from "./registerUser.meta";
+import { type Returns, r, UserRegisterDTO } from "./registerUser.meta";
 
 export const RegisterUsers = new Elysia()
   .use(bearer())

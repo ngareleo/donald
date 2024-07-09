@@ -1,5 +1,5 @@
-import { Static, t } from "elysia";
-import { PublicUser } from "~/repository";
+import { type Static, t } from "elysia";
+import { type PublicUser } from "~/repository";
 
 export const UserLoginDTO = t.Object({
   subject: t.Optional(t.String()),

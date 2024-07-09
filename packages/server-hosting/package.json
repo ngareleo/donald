@@ -3,7 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch index.ts",
+    "dev": "bun run --watch src/index.ts",
     "start": "echo `Echo_ooo_ooo`"
   },
   "dependencies":{

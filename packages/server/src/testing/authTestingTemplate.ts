@@ -2,7 +2,7 @@ import { AuthenticateUser } from "~/controllers/user/authenticateUser";
 import { RegisterUsers } from "~/controllers/user/registerUser";
 import { r as RegisterUserR } from "~/controllers/user/registerUser.meta";
 import { r as AuthenticateUserR } from "~/controllers/user/authenticateUser.meta";
-import { NewUser } from "~/repository";
+import { type NewUser } from "~/repository";
 
 export function authTemplate() {
   let accessToken: string | undefined;

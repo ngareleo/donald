@@ -1,6 +1,7 @@
 {
   "name": "server",
   "version": "1.0.50",
+  "module": "src/index.ts",
   "scripts": {
     "build": "bun build --entrypoints ./src/index.ts --outdir build --target bun --splitting --minify",
     "db:dev": "bunx supabase start",
@@ -45,7 +46,6 @@
     "supabase": "^1.127.4",
     "typescript-eslint": "^7.13.0"
   },
-  "module": "src/index.ts",
   "_moduleAliases": {
     "~": "src"
   }

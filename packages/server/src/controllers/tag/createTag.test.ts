@@ -11,7 +11,7 @@ describe("Test after login", async () => {
   });
 
   it("should create a tag", async () => {
-    const { accessToken, createdUser } = getState();
+    const { accessToken } = getState();
 
     const body: NewTagDTOType = {
       name: "food",

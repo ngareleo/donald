@@ -53,6 +53,7 @@ export async function verifyJWT(
     const { payload: pl } = await jose.jwtVerify<JWTPayload>(token, pk);
     payload = pl;
   } catch (e) {
+    console.error(e);
     return "Invalid";
   }
 
