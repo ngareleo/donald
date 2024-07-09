@@ -1,31 +1,31 @@
 {
   "name": "donald",
-  "module": "index.ts",
   "type": "module",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
+    "build": "bun run --filter * build",
     "clean": "rm -rf node_modules",
-    "start:server": "cd ./packages/server && bun run start"
+    "lint": "bunx eslint && bunx prettier . --find-config-path ./prettier.config.js --write",
+    "start:server": "bun run --filter server start",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "@eslint/js": "^9.5.0",
-    "@types/bun": "latest",
-    "eslint": "9.x",
-    "globals": "^15.6.0",
-    "hercules": "workspace:*",
+    "@eslint/js": "^9.6.0",
+    "eslint": "^9.6.0",
     "husky": "^9.0.11",
+    "lint-staged": "^15.2.7",
     "prettier": "3.3.2",
-    "stark": "workspace:*",
     "typescript-eslint": "^7.13.1"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx,json,css,md}": [
-      "prettier packages/hercules/src --write --ignore-unknown"
+      "prettier packages/*/src/* --write --ignore-unknown"
     ]
+  },
+  "module": "index.ts",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   }
 }

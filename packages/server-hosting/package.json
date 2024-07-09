@@ -1,0 +1,15 @@
+{
+  "name": "server-hosting",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch index.ts",
+    "start": "echo `Echo_ooo_ooo`"
+  },
+  "dependencies":{
+    "server": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
