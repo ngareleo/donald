@@ -21,11 +21,3 @@ const startApplication = () => {
 };
 
 startApplication();
-
-//The export below is rightfully imported in stark iff the code above is commented
-//Otherwise the code above will be executed on running the index file in stark
-
-//I think this file can be dedicated for imports and exports if hercules has to relate with the other packages in the monorepo
-import { helloTraveller } from "./hello";
-
-export default helloTraveller;
