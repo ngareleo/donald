@@ -1,29 +1,5 @@
-# Donald (beta)
+# Dev branch: Experimental mono repo (do not delete)
 
-This is the backend for our Mapesa platform. This is still a prototype
+This git branch is an experimental use of bun's workspaces. Currently the bun (9th July 2024) bun is still experimental but is very ahead of beneficial compared to `node` to ignore it. Workspaces which is suposed to help setup mono repos without 3rd party. However it comes with too many caveats and we don't have the man power to do brute-force through it (maybe in the future). There's also incompatibility issues with existing monorepo solutions likes _turborepo_. So I've set this branch aside and will come back to it later.
 
-To start the server you need to
-
-Get deps
-
-`bun install`
-
-Login into supabase for local dev. You will need to create a supabase account
-
-`bun run db:login`
-
-Setup supabase. (Docker desktop is required). No need to run migrations; su-supabase does that automatically.
-
-`bun run db:dev`
-
-
-To get the connection strings run `bun run db:status`. Recommended (`bun run db:status >> .env` to create env vars)
-
-You'll need to generate ssh keys for signing tokens:
-
-`bun run generate:ssh`
-
-
-then start the server:
-
-`bun run dev`
+For now, we'll stick to a simple repository and prioritize agility.
