@@ -6,7 +6,8 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "start:server": "cd ./packages/server && bun run start"
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",
