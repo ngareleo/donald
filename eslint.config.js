@@ -4,12 +4,9 @@ import tseslint from "typescript-eslint";
 import tsParser from "@typescript-eslint/parser";
 
 export default [
-  { languageOptions: { globals: globals.node } },
-
-  pluginJs.configs.recommended,
-
   ...tseslint.configs.recommended,
-
+  pluginJs.configs.recommended,
+  { languageOptions: { globals: globals.node } },
   {
     files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
@@ -17,14 +14,11 @@ export default [
       parserOptions: {
         project: "./tsconfig.json",
       },
+      globals: {
+        Bun: true,
+      },
     },
     rules: {
-      // "no-console": "warn",
-      quotes: [
-        "warn",
-        "double",
-        { avoidEscape: true, allowTemplateLiterals: true },
-      ],
       semi: ["error", "always"],
       "no-unused-vars": [
         "warn",
