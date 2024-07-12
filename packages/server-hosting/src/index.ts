@@ -1,3 +1,3 @@
-import helloTraveller from "server";
+import helloTraveller from "server"
 
-helloTraveller();
+helloTraveller()

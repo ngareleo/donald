@@ -40,7 +40,6 @@
     "@sinclair/typebox": "^0.32.28",
     "@types/bun": "^1.1.6",
     "drizzle-kit": "^0.20.10",
-    "eslint-config-prettier": "^9.1.0",
     "neonctl": "^1.30.0",
     "supabase": "^1.127.4"
   },
