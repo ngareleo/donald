@@ -1,1 +1,1 @@
-console.log("Welcome travellers.")
+console.log("Welcome travelers");
