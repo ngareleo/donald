@@ -1,0 +1,21 @@
+{
+  "name": "mapesa-app",
+  "description": "The Mapesa UI application entry point",
+  "module": "src/index.tsx",
+  "type": "module",
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^5.16.1",
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "tsconfig": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0",
+    "typescript": "^5.0.0"   
+  }
+}
