@@ -3,7 +3,7 @@
   "module": "index.ts",
   "scripts": {
     "dev": "webpack serve",
-    "build": "webpack"  
+    "build": "webpack --env production"  
   },
   "dependencies": {
     "@babel/core": "^7.24.8",

@@ -12,9 +12,6 @@
     "start:server": "bun run --filter server start",
     "prepare": "husky"
   },
-  "dependencies": {
-    "server": "workspace:*"
-  },
   "devDependencies": {
     "@eslint/js": "^9.6.0",
     "husky": "^9.0.11",
