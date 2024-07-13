@@ -1,13 +1,13 @@
 import { Elysia } from "elysia";
-import UsersController from "~/controllers/user/@main";
-import UploadController from "~/controllers/upload/@main";
-import TagsController from "~/controllers/tag/@main";
+import UsersController from "~/features/authentication/@main";
+import UploadController from "~/features/upload/@main";
+import TagController from "~/features/transaction_tags/@main";
 import {
     useApplicationConfigs,
     useMainApplicationErrorHandling,
 } from "~/hooks";
 
-const greeting = "Hello Travelers!";
+const greeting = "Hello Traveler!";
 
 const App = new Elysia()
     .use(useMainApplicationErrorHandling)
@@ -15,6 +15,6 @@ const App = new Elysia()
     .get("/", () => greeting)
     .use(UsersController)
     .use(UploadController)
-    .use(TagsController);
+    .use(TagController);
 
 export default App;

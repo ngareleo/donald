@@ -1,3 +1,3 @@
-import { migratePostgresDb } from "~/repository";
+import { migratePostgresDb } from "server-repository";
 
 migratePostgresDb();

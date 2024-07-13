@@ -1,11 +1,10 @@
 {
-    "extends": "tsconfig/tsconfig.json",
+    "extends": "tsconfig/tsconfig",
     "compilerOptions": {
         "module": "esnext",
         "baseUrl": ".",
         "paths": {
             "~/*": ["src/*"]
-        },
-        "types": ["@types/bun"]
+        }
     }
 }

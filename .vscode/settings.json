@@ -3,6 +3,11 @@
     "**/node_modules": false
   },
   "cSpell.words": [
-    "elysia"
+    "elysia",
+    "elysiajs",
+    "neonctl",
+    "neondatabase",
+    "supabase",
+    "typebox"
   ]
 }

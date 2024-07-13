@@ -1,8 +1,8 @@
-import { AuthenticateUser } from "~/controllers/user/authenticateUser";
-import { RegisterUsers } from "~/controllers/user/registerUser";
-import { r as RegisterUserR } from "~/controllers/user/registerUser.meta";
-import { r as AuthenticateUserR } from "~/controllers/user/authenticateUser.meta";
-import { type NewUser } from "~/repository";
+import { type NewUser } from "server-repository";
+import { AuthenticateUser } from "~/features/authentication/authenticateUser";
+import { RegisterUsers } from "~/features/authentication/registerUser";
+import { r as RegisterUserR } from "~/features/authentication/registerUser.meta";
+import { r as AuthenticateUserR } from "~/features/authentication/authenticateUser.meta";
 
 export function authTemplate() {
     let accessToken: string | undefined;
@@ -32,7 +32,7 @@ export function authTemplate() {
             .catch((e) => console.error(e));
     };
 
-    /** Call iniside `beforeAll` to login and get accessToken */
+    /** Call inside `beforeAll` to login and get accessToken */
     const login = async () => {
         const body = {
             subject: user.username,
