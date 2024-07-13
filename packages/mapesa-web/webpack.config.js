@@ -24,7 +24,7 @@ module.exports = function (env) {
                                 ...(env.production
                                     ? []
                                     : [
-                                          // "@babel/plugin-transform-react-jsx-development",
+                                          "@babel/plugin-transform-react-jsx-development",
                                       ]),
                             ],
                         },

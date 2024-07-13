@@ -1,16 +1,17 @@
 //  NOTE: Please do not include in index file. It is exclusive to the bunfig.toml for tests preloading
 import { afterAll, beforeAll } from "bun:test";
 import { type EnvVars, loadConfigs } from "~/config";
-import { setupNeonDatabaseConnection, migrateNeonDb } from "~/repository";
-import { seedTransactionTypes } from "~/repository/seed";
 import {
+    applyNeonTemplate,
+    setupNeonDatabaseConnection,
+    migrateNeonDb,
     createNeonBranch,
     loadNeonProject,
     destroyNeonTestingBranchDB,
+    seedTransactionTypes,
     type NeonProject,
     type CreatedBranchResponse,
-    applyNeonTemplate,
-} from "~/repository/neon";
+} from "server-repository";
 import { authTemplate } from "./authTestingTemplate";
 
 // TODO: Allow tests to run without network
@@ -52,12 +53,12 @@ function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
             project: mapesaProject?.id || "",
         }).catch((e) => {
             console.error(
-                `❗️ Couldn't cleanup the Neon DB!\n${JSON.stringify(e)}`,
+                `❗️ Couldn't cleanup the Neon DB!\n${JSON.stringify(e)}`
             );
         });
         console.info(
             "✅ Cleanup successful. Cleanup info\n",
-            verbose ? info : "",
+            verbose ? info : ""
         );
     };
 
@@ -70,16 +71,16 @@ function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
         mapesaProject = await loadNeonProject({ apiKey: apiKey! }).catch(
             (e) => {
                 console.error(
-                    `❗️ Couldn't load the Neon project! Stopping tests\n${JSON.stringify(e)}`,
+                    `❗️ Couldn't load the Neon project! Stopping tests\n${JSON.stringify(e)}`
                 );
                 // no cleanup needed
                 process.exit(-1);
-            },
+            }
         );
 
         console.info(
             "🐳 Mapesa project loaded \n",
-            verbose && env != "ci" ? mapesaProject : "", // hide this log in ci to avoid data leak
+            verbose && env != "ci" ? mapesaProject : "" // hide this log in ci to avoid data leak
         );
 
         // We create a branch ID inside the project
@@ -89,8 +90,8 @@ function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
         }).catch((e) => {
             console.error(
                 `❗️ Couldn't create a Neon branch for testing! Stopping tests\n${JSON.stringify(
-                    e,
-                )}`,
+                    e
+                )}`
             );
             // no cleanup needed
             process.exit(-1);
@@ -113,15 +114,15 @@ function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
         await migrateNeonDb({ cacheKey: "PreloadKey" }).catch((e) => {
             console.error(
                 `❗️ Couldn't run migrations on Neon!Tests will continue without seed data. Chance is the data already exists\n${JSON.stringify(
-                    e,
-                )}`,
+                    e
+                )}`
             );
         });
 
         // seed the database
         await seedTransactionTypes(neonDbConnection).catch((e) => {
             console.error(
-                `❗️Couldn't run seed the Neon DB! Tests will continue without seed data. Chance is the data already exists\n${JSON.stringify(e)}`,
+                `❗️Couldn't run seed the Neon DB! Tests will continue without seed data. Chance is the data already exists\n${JSON.stringify(e)}`
             );
         });
 

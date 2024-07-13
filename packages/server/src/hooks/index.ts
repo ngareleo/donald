@@ -1,7 +1,5 @@
 import { Elysia, t } from "elysia";
-import bearer from "@elysiajs/bearer";
-import { findUserById, getDatabaseInstance } from "~/repository";
-import { readPemFiles, verifyJWT } from "~/utils/jwt";
+import { getDatabaseInstance, transactionTypeTable } from "server-repository";
 import { loadConfigs } from "~/config";
 
 export const useMainApplicationErrorHandling = new Elysia().onError(
@@ -22,66 +20,19 @@ export const useMainApplicationErrorHandling = new Elysia().onError(
                 set.status = 400;
                 return "Bad Request :(";
         }
-    },
+    }
 );
 
 export const useApplicationConfigs = new Elysia().state(
     "config",
-    loadConfigs(),
+    loadConfigs()
 );
 
 export const useTransactionTypes = new Elysia().state(
     "transactionTypes",
     await (async () => {
-        const connection = getDatabaseInstance();
-        return await connection!.query.transactionTypeTable.findMany();
-    })(),
+        const db = getDatabaseInstance();
+        const types = await db.select().from(transactionTypeTable);
+        return types;
+    })()
 );
-
-export const useAuthenticateUser = new Elysia()
-    .guard({
-        headers: t.Object({
-            authorization: t.TemplateLiteral("Bearer ${string}"),
-        }),
-    })
-    .use(bearer())
-    .state("keys", readPemFiles)
-    .onBeforeHandle(async ({ bearer, set, store: { keys } }) => {
-        if (!bearer) {
-            set.status = 401;
-            set.headers["WWW-Authenticate"] =
-                `Bearer realm='sign', error="invalid_request"`;
-
-            return { message: "not_authenticated" };
-        }
-
-        const { publicKey } = await keys();
-        const payload = await verifyJWT(publicKey, bearer);
-
-        if (typeof payload === "string") {
-            set.status = 401;
-            set.headers["WWW-Authenticate"] =
-                `Bearer realm='sign', error="invalid_token"`;
-            switch (payload) {
-                case "User not found":
-                case "Invalid":
-                    return { message: "invalid_token" };
-                case "Expired":
-                    return { message: "expired_token" };
-            }
-        }
-    })
-    .derive(async ({ bearer, store: { keys } }) => {
-        const { publicKey } = await keys();
-        const payload = await verifyJWT(publicKey, bearer!);
-
-        if (typeof payload === "string") {
-            return {};
-        }
-
-        const user = await findUserById(Number(payload.sub));
-
-        return {
-            user,
-        };
-    });

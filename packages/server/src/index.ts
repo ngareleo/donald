@@ -15,7 +15,7 @@ const startApplication = () => {
 
     if (processEnvironment === "dev") {
         console.info(
-            `📶 Elysia is running at http://${application.server?.hostname}:${application.server?.port}`,
+            `📶 Elysia is running at http://${application.server?.hostname}:${application.server?.port}`
         );
     }
 };
