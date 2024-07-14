@@ -9,6 +9,7 @@ import {
     loadNeonProject,
     destroyNeonTestingBranchDB,
     seedTransactionTypes,
+    Repository,
     type NeonProject,
     type CreatedBranchResponse,
 } from "server-repository";
@@ -24,6 +25,8 @@ if (!neonApiKey || !neonDBConnectionTemplate) {
     console.error("❗️ Missing Neon API Key. Stopping tests.");
     process.exit(-1);
 }
+
+const repository = Repository.getInstance();
 
 const { preload } = authTemplate();
 // Run post and pre

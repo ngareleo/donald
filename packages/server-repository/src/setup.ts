@@ -24,7 +24,7 @@ export type NeonDBType = ReturnType<typeof NeonDrizzle>;
 export type PostgresDBType = ReturnType<typeof PostgresJSDrizzle>;
 
 type PrivateConnectionType = {
-    cacheKey: string;
+    key: string;
     value: DefaultConnectionType["value"];
     migrate: () => Promise<void>;
 };
@@ -44,8 +44,6 @@ type GenericConnectionType =
           value: PostgresDBType;
           migrate: () => Promise<void>;
       };
-
-function openShortLivedConnection() {}
 
 export type DBConnectionType = [
     // add keys here to cache the db and retrieve later
@@ -96,8 +94,8 @@ export class Repository {
         Repository.configs = Repository.loadConfig();
     }
 
-    public static getInstance(props: Props): Repository {
-        if (!Repository.instance) {
+    public static getInstance(props?: Props): Repository | null {
+        if (!Repository.instance && props) {
             Repository.instance = new Repository(props);
         }
         return Repository.instance;
@@ -227,12 +225,12 @@ export class Repository {
         url: string;
         key: string;
         type: DefaultConnectionType["key"];
-    }) {
+    }): PrivateConnectionType {
         const { url, key, type } = args;
         const { migrationsFolder } = Repository.configs;
-        const cache = Repository.genericConnections.get(key);
+        const cache = Repository.privateConnections.get(key);
         const value =
-            cache ?? type === "sl-connection"
+            cache || type === "sl-connection"
                 ? (() => {
                       const { longLivedDbUrl: url, verbose } =
                           Repository.configs;
@@ -243,7 +241,7 @@ export class Repository {
                       Repository.log(
                           `New connection to Neon Db established using ${url}`
                       );
-                      Repository.genericConnections.set(key, db);
+                      Repository.privateConnections.set(key, db);
                       return db;
                   })()
                 : (() => {
@@ -253,7 +251,7 @@ export class Repository {
                       Repository.log(
                           `New connection to Neon Db established using ${url}`
                       );
-                      Repository.genericConnections.set(key, db);
+                      Repository.privateConnections.set(key, db);
 
                       return db;
                   })();

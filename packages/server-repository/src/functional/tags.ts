@@ -3,64 +3,88 @@ import {
     transactionTagsTable,
     transactionsTable,
     tagsTable,
-    getDatabaseInstance,
     type NewTag,
     type NewTransactionTag,
+    type NeonDBType,
+    type PostgresDBType,
 } from "..";
 
-export async function insertNewTag(payload: NewTag | NewTag[]) {
-    const db = getDatabaseInstance();
-    const pa = Array.isArray(payload) ? payload : [payload];
-    // ignore the error below
-    return await db.insert(tagsTable).values(pa).returning({
-        id: tagsTable.id,
-        name: tagsTable.name,
-        description: tagsTable.description,
-    });
-}
+type Props = {
+    loadDbInstance: () => NeonDBType | PostgresDBType;
+};
 
-export async function linkTagToTransaction(payload: NewTransactionTag) {
-    const db = getDatabaseInstance();
-    // ignore the error below
-    return await db.insert(transactionTagsTable).values(payload).returning({
-        id: transactionTagsTable.id,
-        tagId: transactionTagsTable.tagId,
-        transactionId: transactionTagsTable.transactionId,
-    });
-}
+export class TagsRepository {
+    static loadDb: Props["loadDbInstance"];
 
-export async function getAllUserTags(id: number) {
-    const db = getDatabaseInstance();
-    return await db
-        .select()
-        .from(tagsTable)
-        .where(eq(tagsTable.userId, id))
-        .leftJoin(
-            transactionTagsTable,
-            eq(tagsTable.id, transactionTagsTable.tagId)
-        )
-        .leftJoin(
-            transactionsTable,
-            eq(transactionTagsTable.transactionId, transactionsTable.id)
+    constructor(props?: Props) {
+        if (props) {
+            TagsRepository.loadDb = props.loadDbInstance;
+        }
+        throw Error("Cannot invoke without init");
+    }
+
+    async insertNewTag(payload: NewTag | NewTag[]) {
+        const pa = Array.isArray(payload) ? payload : [payload];
+        const db = TagsRepository.loadDb();
+        // ignore the error below
+        return await db?.insert(tagsTable).values(pa).returning({
+            id: tagsTable.id,
+            name: tagsTable.name,
+            description: tagsTable.description,
+        });
+    }
+
+    async linkTagToTransaction(payload: NewTransactionTag) {
+        const db = TagsRepository.loadDb();
+        // ignore the error below
+        return await db
+            ?.insert(transactionTagsTable)
+            .values(payload)
+            .returning({
+                id: transactionTagsTable.id,
+                tagId: transactionTagsTable.tagId,
+                transactionId: transactionTagsTable.transactionId,
+            });
+    }
+
+    async getAllUserTags(id: number) {
+        const db = TagsRepository.loadDb();
+        return await db
+            ?.select()
+            .from(tagsTable)
+            .where(eq(tagsTable.userId, id))
+            .leftJoin(
+                transactionTagsTable,
+                eq(tagsTable.id, transactionTagsTable.tagId)
+            )
+            .leftJoin(
+                transactionsTable,
+                eq(transactionTagsTable.transactionId, transactionsTable.id)
+            );
+    }
+
+    async getTagById(userId: number, tagId: Array<number>) {
+        const db = TagsRepository.loadDb();
+        return await Promise.all(
+            tagId.map(async (id) => {
+                return await db
+                    ?.select()
+                    .from(tagsTable)
+                    .where(
+                        and(eq(tagsTable.userId, userId), eq(tagsTable.id, id))
+                    )
+                    .leftJoin(
+                        transactionTagsTable,
+                        eq(tagsTable.id, transactionTagsTable.tagId)
+                    )
+                    .leftJoin(
+                        transactionsTable,
+                        eq(
+                            transactionTagsTable.transactionId,
+                            transactionsTable.id
+                        )
+                    );
+            })
         );
-}
-
-export async function getTagById(userId: number, tagId: Array<number>) {
-    const db = getDatabaseInstance();
-    return await Promise.all(
-        tagId.map(async (id) => {
-            return await db
-                .select()
-                .from(tagsTable)
-                .where(and(eq(tagsTable.userId, userId), eq(tagsTable.id, id)))
-                .leftJoin(
-                    transactionTagsTable,
-                    eq(tagsTable.id, transactionTagsTable.tagId)
-                )
-                .leftJoin(
-                    transactionsTable,
-                    eq(transactionTagsTable.transactionId, transactionsTable.id)
-                );
-        })
-    );
+    }
 }

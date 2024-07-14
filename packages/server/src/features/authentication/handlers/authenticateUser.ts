@@ -1,6 +1,6 @@
 import Elysia from "elysia";
 import bearer from "@elysiajs/bearer";
-import { readPemFiles, getJWT } from "./@utils";
+import { readPemFiles, getJWT } from "../@utils";
 import { findUserByUsername } from "server-repository";
 import { type Returns, UserLoginDTO, r } from "./authenticateUser.meta";
 

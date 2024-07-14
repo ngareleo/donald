@@ -1,6 +1,6 @@
 import Elysia from "elysia";
 import bearer from "@elysiajs/bearer";
-import { readPemFiles } from "./@utils";
+import { readPemFiles } from "../@utils";
 import { insertUser } from "server-repository";
 import { type Returns, r, UserRegisterDTO } from "./registerUser.meta";
 
