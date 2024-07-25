@@ -18,7 +18,6 @@ export const useAuthenticateUser = new Elysia()
             set.status = 401;
             set.headers["WWW-Authenticate"] =
                 `Bearer realm='sign', error="invalid_request"`;
-
             return { message: "not_authenticated" };
         }
 

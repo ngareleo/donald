@@ -1,7 +1,6 @@
 import { beforeAll, describe, expect, it } from "bun:test";
 import { authTemplate } from "~/testing";
-import { r, type NewTagDTOType } from "./createTag.meta";
-import { CreateTag } from "./createTag";
+import { CreateTag, r } from "./createTag";
 
 const { login, getState } = authTemplate();
 
@@ -13,7 +12,7 @@ describe("Test after login", async () => {
     it("should create a tag", async () => {
         const { accessToken } = getState();
 
-        const body: NewTagDTOType = {
+        const body = {
             name: "food",
             description: "Food items including groceries",
         };

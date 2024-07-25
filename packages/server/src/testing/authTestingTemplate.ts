@@ -1,8 +1,8 @@
 import { type NewUser } from "server-repository";
-import { AuthenticateUser } from "~/features/authentication/authenticateUser";
-import { RegisterUsers } from "~/features/authentication/registerUser";
-import { r as RegisterUserR } from "~/features/authentication/registerUser.meta";
-import { r as AuthenticateUserR } from "~/features/authentication/authenticateUser.meta";
+import { AuthenticateUser } from "~/features/authentication/handlers/authenticateUser";
+import { RegisterUsers } from "~/features/authentication/handlers/registerUser";
+import { r as RegisterUserR } from "~/features/authentication/handlers/registerUser.meta";
+import { r as AuthenticateUserR } from "~/features/authentication/handlers/authenticateUser.meta";
 
 export function authTemplate() {
     let accessToken: string | undefined;

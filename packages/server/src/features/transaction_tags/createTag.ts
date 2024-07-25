@@ -1,8 +1,10 @@
 import Elysia from "elysia";
 import { useTransactionTypes } from "~/hooks";
-import { insertNewTag } from "server-repository";
-import { CreateTagDTO, r } from "./createTag.meta";
+import { TagsRepository } from "server-repository";
 import { useAuthenticateUser } from "~/features/authentication/@hooks";
+import { t } from "elysia";
+
+export const r = "/";
 
 /**
  * Creates a new Tag in `tags` table.
@@ -22,10 +24,21 @@ export const CreateTag = new Elysia()
                       ...body,
                       userId: user?.id,
                   };
-            const tag = await insertNewTag(payload);
+            const tag = await new TagsRepository().insertNewTag(payload);
             return { tag, message: "OK" };
         },
         {
-            body: CreateTagDTO,
+            body: t.Union([
+                t.Object({
+                    name: t.String(),
+                    description: t.Optional(t.String()),
+                }),
+                t.Array(
+                    t.Object({
+                        name: t.String(),
+                        description: t.Optional(t.String()),
+                    })
+                ),
+            ]),
         }
     );

@@ -24,7 +24,7 @@ export type NeonDBType = ReturnType<typeof NeonDrizzle>;
 export type PostgresDBType = ReturnType<typeof PostgresJSDrizzle>;
 
 type PrivateConnectionType = {
-    cacheKey: string;
+    key: string;
     value: DefaultConnectionType["value"];
     migrate: () => Promise<void>;
 };
@@ -45,8 +45,6 @@ type GenericConnectionType =
           migrate: () => Promise<void>;
       };
 
-function openShortLivedConnection() {}
-
 export type DBConnectionType = [
     // add keys here to cache the db and retrieve later
     "CliDBType", // example
@@ -58,7 +56,7 @@ export type CacheDBKeyType =
 
 export type CacheValueType = NeonDBType | PostgresDBType;
 
-export class Repository {
+export class Connections {
     /**
      * Ideally we have two types of DBs (Neon and Postgresql)
      * This information is not abstracted from this module
@@ -83,7 +81,7 @@ export class Repository {
     >();
     private static loadConfig: Props["loadConfig"] | undefined;
     private static configs: Config;
-    private static instance: Repository;
+    private static instance: Connections;
 
     private static genericConnections = new Map<
         GenericConnectionType["key"],
@@ -92,15 +90,15 @@ export class Repository {
     private static privateConnections = new Map();
 
     constructor({ loadConfig }: Props) {
-        Repository.loadConfig = loadConfig;
-        Repository.configs = Repository.loadConfig();
+        Connections.loadConfig = loadConfig;
+        Connections.configs = Connections.loadConfig();
     }
 
-    public static getInstance(props: Props): Repository {
-        if (!Repository.instance) {
-            Repository.instance = new Repository(props);
+    public static getInstance(props?: Props): Connections | null {
+        if (!Connections.instance && props) {
+            Connections.instance = new Connections(props);
         }
-        return Repository.instance;
+        return Connections.instance;
     }
 
     /**
@@ -164,7 +162,7 @@ export class Repository {
      * ❤️ Recommended to use backtick string formatting ❤️ (``)
      * */
     private static log(args: string) {
-        const { verbose } = Repository.configs;
+        const { verbose } = Connections.configs;
         if (verbose) {
             console.log("[repository]", args);
         }
@@ -172,23 +170,23 @@ export class Repository {
 
     private async getGenericLLConnection(): Promise<GenericConnectionType> {
         const key = "genericLongLivedConnection" as const;
-        const cache = Repository.genericConnections.get(key);
+        const cache = Connections.genericConnections.get(key);
         const value = cache
             ? cache
             : (() => {
-                  const { longLivedDbUrl: url, verbose } = Repository.configs;
+                  const { longLivedDbUrl: url, verbose } = Connections.configs;
                   const db = NeonDrizzle(neon(url), {
                       schema,
                       logger: verbose || false, // Basic logging to the stdout
                   });
-                  Repository.log(
+                  Connections.log(
                       `New connection to Neon Db established using ${url}`
                   );
-                  Repository.genericConnections.set(key, db);
+                  Connections.genericConnections.set(key, db);
                   return db;
               })();
 
-        const { migrationsFolder } = Repository.configs;
+        const { migrationsFolder } = Connections.configs;
         const migrate = async () => {
             await PostgresJSMigrator(value, { migrationsFolder });
             console.info("🎒 Migrations on PostgresJS Db complete");
@@ -199,22 +197,22 @@ export class Repository {
 
     private getGenericSLConnection(): GenericConnectionType {
         const key = "genericShortLivedConnection" as const;
-        const cache = Repository.genericConnections.get(key);
+        const cache = Connections.genericConnections.get(key);
         const value = cache
             ? cache
             : (() => {
-                  const { shortLivedDbUrl: url } = Repository.configs;
+                  const { shortLivedDbUrl: url } = Connections.configs;
                   const db = PostgresJSDrizzle(postgres(url), {
                       schema,
                   });
-                  Repository.log(
+                  Connections.log(
                       `New connection to Neon Db established using ${url}`
                   );
-                  Repository.genericConnections.set(key, db);
+                  Connections.genericConnections.set(key, db);
 
                   return db;
               })();
-        const { migrationsFolder } = Repository.configs;
+        const { migrationsFolder } = Connections.configs;
         const migrate = async () => {
             await NeonMigrator(value, { migrationsFolder });
             console.info("🎒 Migrations on NeonDB complete!");
@@ -227,33 +225,33 @@ export class Repository {
         url: string;
         key: string;
         type: DefaultConnectionType["key"];
-    }) {
+    }): PrivateConnectionType {
         const { url, key, type } = args;
-        const { migrationsFolder } = Repository.configs;
-        const cache = Repository.genericConnections.get(key);
+        const { migrationsFolder } = Connections.configs;
+        const cache = Connections.privateConnections.get(key);
         const value =
-            cache ?? type === "sl-connection"
+            cache || type === "sl-connection"
                 ? (() => {
                       const { longLivedDbUrl: url, verbose } =
-                          Repository.configs;
+                          Connections.configs;
                       const db = NeonDrizzle(neon(url), {
                           schema,
                           logger: verbose || false, // Basic logging to the stdout
                       });
-                      Repository.log(
+                      Connections.log(
                           `New connection to Neon Db established using ${url}`
                       );
-                      Repository.genericConnections.set(key, db);
+                      Connections.privateConnections.set(key, db);
                       return db;
                   })()
                 : (() => {
                       const db = PostgresJSDrizzle(postgres(url), {
                           schema,
                       });
-                      Repository.log(
+                      Connections.log(
                           `New connection to Neon Db established using ${url}`
                       );
-                      Repository.genericConnections.set(key, db);
+                      Connections.privateConnections.set(key, db);
 
                       return db;
                   })();
@@ -284,8 +282,8 @@ export class Repository {
         overrideURL?: string;
         cacheKey?: CacheDBKeyType;
     }): NeonDBType {
-        const { shortLivedDbUrl: testingDbURL, verbose } = Repository.configs;
-        const connectionsCache = Repository.connectionsCache;
+        const { shortLivedDbUrl: testingDbURL, verbose } = Connections.configs;
+        const connectionsCache = Connections.connectionsCache;
         const key = args?.cacheKey || "testingConnection";
 
         console.log("Key used ", key);
@@ -313,11 +311,11 @@ export class Repository {
      * Creates a database instance, if already invoked, reuses open connection
      */
     getDatabaseInstance(): CacheValueType {
-        const { processEnvironment } = Repository.configs;
+        const { processEnvironment } = Connections.configs;
         if (processEnvironment === "test") {
             // we look for the preload-cache key
             return (
-                Repository.connectionsCache.get("PreloadKey") ||
+                Connections.connectionsCache.get("PreloadKey") ||
                 this.setupNeonDatabaseConnection()
             );
         }
@@ -333,7 +331,7 @@ export class Repository {
         overrideURL?: string;
         cacheKey?: CacheDBKeyType;
     }) {
-        const { migrationsFolder } = Repository.configs;
+        const { migrationsFolder } = Connections.configs;
         const neonDb = this.setupNeonDatabaseConnection({
             overrideURL: args?.overrideURL,
             cacheKey: args?.cacheKey,
@@ -348,8 +346,8 @@ export class Repository {
      */
     setupPostgresDatabaseConnection(): PostgresDBType {
         const prodKey = "prodConnection";
-        const { longLivedDbUrl: localDbURL } = Repository.configs;
-        const connectionsCache = Repository.connectionsCache;
+        const { longLivedDbUrl: localDbURL } = Connections.configs;
+        const connectionsCache = Connections.connectionsCache;
 
         const cachedConnection = connectionsCache.get(prodKey);
 
@@ -369,7 +367,7 @@ export class Repository {
      * Runs migrations on a PostgresJS Database
      */
     async migratePostgresDb(args: { key: string }) {
-        const { migrationsFolder } = Repository.configs;
+        const { migrationsFolder } = Connections.configs;
         const postDb = this.setupPostgresDatabaseConnection();
         await PostgresJSMigrator(postDb, { migrationsFolder });
         console.info("🎒 Migrations on PostgresJS Db complete");
