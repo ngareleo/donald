@@ -1,11 +1,10 @@
-import Elysia from "elysia";
-import { insertNewTransactions } from "server-repository";
+import Elysia, { t } from "elysia";
+import { TransactionsRepository } from "server-repository";
 import { useTransactionTypes } from "~/hooks";
-import { IncomingTransactionPayloadDTO } from "./uploadBatchTransactions.meta";
 import { useAuthenticateUser } from "~/features/authentication/@hooks";
 
 /**
- * Recieves a payload of transactions uploads the payload atomically
+ * Receives a payload of transactions uploads the payload atomically
  * @ params Array of transactions
  *
  * @returns {status: OKAY or FAIL, reason?: "Reason for failure if status is FAIL"}
@@ -45,10 +44,30 @@ export const UploadBatchTransactions = new Elysia()
                     userId: user?.id,
                 };
             });
-            return await insertNewTransactions(transactions);
+            return await new TransactionsRepository().insertNewTransactions(
+                transactions
+            );
         },
         {
             type: "application/json",
-            body: IncomingTransactionPayloadDTO,
+            body: t.Object({
+                raw: t.Array(
+                    t.Object({
+                        agentNumber: t.Optional(t.String()),
+                        balance: t.String(),
+                        dateTime: t.String(),
+                        interest: t.Optional(t.String()),
+                        location: t.Optional(t.String()),
+                        messageId: t.String(),
+                        subject: t.String(),
+                        subjectAccount: t.Optional(t.String()),
+                        subjectPhoneNumber: t.Optional(t.String()),
+                        transactionAmount: t.String(),
+                        transactionCode: t.String(),
+                        transactionCost: t.String(),
+                        type: t.String(),
+                    })
+                ),
+            }),
         }
     );

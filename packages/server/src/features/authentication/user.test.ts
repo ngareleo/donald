@@ -1,16 +1,10 @@
 import { describe, expect, it } from "bun:test";
 import { type NewUser } from "server-repository";
-import {
-    type UserRegisterDTOType,
-    r as RegisterUserR,
-} from "./registerUser.meta";
-import { RegisterUsers } from "./registerUser";
-import { AuthenticateUser } from "./authenticateUser";
-import { r as AuthenticateUserR } from "./authenticateUser.meta";
-import { VerifyAccessToken } from "./verifyAccessToken";
-import { r as VerifyAccessR } from "./verifyAccessToken.meta";
+import { RegisterUsers, r as RegisterUserR } from "./registerUser";
+import { AuthenticateUser, r as AuthenticateUserR } from "./authenticateUser";
+import { VerifyAccessToken, r as VerifyAccessR } from "./verifyAccessToken";
 
-const user: UserRegisterDTOType = {
+const user = {
     email: "test@testaccount.com",
     password: "testPassword",
     username: "testUser0",

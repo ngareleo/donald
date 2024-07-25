@@ -1,7 +1,7 @@
 import Elysia from "elysia";
-import { linkTagToTransaction } from "server-repository";
+import { TagsRepository } from "server-repository";
 import { useAuthenticateUser } from "~/features/authentication/@hooks";
-import { LinkItemDTO } from "./linkTagToTransaction.meta";
+import { t } from "elysia";
 
 /**
  * Link to a tag to an existing transaction
@@ -13,9 +13,12 @@ export const LinkTagToTransaction = new Elysia().use(useAuthenticateUser).post(
             ...body,
             userId: user?.id,
         };
-        return await linkTagToTransaction(payload);
+        return await new TagsRepository().linkTagToTransaction(payload);
     },
     {
-        body: LinkItemDTO,
+        body: t.Object({
+            tagId: t.Number(),
+            transactionId: t.Number(),
+        }),
     }
 );

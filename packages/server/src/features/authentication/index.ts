@@ -1,6 +1,6 @@
 // Import utils and hooks first then
 
 // Import controllers
-export * from "./handlers/authenticateUser";
-export * from "./handlers/registerUser";
-export * from "./handlers/verifyAccessToken";
+export * from "./authenticateUser";
+export * from "./registerUser";
+export * from "./verifyAccessToken";

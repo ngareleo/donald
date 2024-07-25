@@ -1,7 +1,7 @@
 import Elysia, { t } from "elysia";
 import { useTransactionTypes } from "~/hooks";
 import { useAuthenticateUser } from "~/features/authentication/@hooks";
-import { getTagById } from "server-repository";
+import { TagsRepository } from "server-repository";
 
 export const GetTag = new Elysia()
     .use(useAuthenticateUser)
@@ -10,7 +10,10 @@ export const GetTag = new Elysia()
         "/:id",
         async ({ user, params: { id }, body: { ids } }) => {
             // Should return deep nests of tags with transactions
-            const res = await getTagById(user?.id!, [id, ...ids]);
+            const res = await new TagsRepository().getTagById(user?.id!, [
+                id,
+                ...ids,
+            ]);
             return res;
         },
         {

@@ -3,6 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
+    "build": "bun build --entrypoints ./src/index.ts --outdir build --target bun",
     "dev": "bunx supabase start",
     "generate": "drizzle-kit generate:pg --config drizzle.config.ts",
     "login": "bunx supabase login --no-browser",

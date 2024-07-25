@@ -1,5 +1,5 @@
 export * from "./schema";
-export * from "./setup";
+export * from "./connections";
 export * from "./functional/tags";
 export * from "./functional/transactions";
 export * from "./functional/user";
