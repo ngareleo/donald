@@ -15,6 +15,8 @@ export const AuthenticateUser = new Elysia().state("keys", readPemFiles).post(
     r,
     async ({ body, set, store: { keys } }): Promise<R> => {
         const { subject, password } = body;
+        const userRepository = UserRepository.getInstance();
+
         if (!subject) {
             set.status = 400;
             return {
@@ -22,7 +24,7 @@ export const AuthenticateUser = new Elysia().state("keys", readPemFiles).post(
             };
         }
 
-        const response = await new UserRepository().findUserByUsername(
+        const response = await userRepository.findUserByUsername(
             subject,
             password
         );

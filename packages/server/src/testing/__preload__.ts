@@ -3,33 +3,35 @@ import { afterAll, beforeAll } from "bun:test";
 import { type EnvVars, loadConfigs } from "~/config";
 import {
     applyNeonTemplate,
-    setupNeonDatabaseConnection,
-    migrateNeonDb,
     createNeonBranch,
     loadNeonProject,
     destroyNeonTestingBranchDB,
     seedTransactionTypes,
-    Repository,
     type NeonProject,
     type CreatedBranchResponse,
+    Connections,
 } from "server-repository";
 import { authTemplate } from "./authTestingTemplate";
 
 // TODO: Allow tests to run without network
 // TODO: Reuse this work to setup our dev flow
 // load env var from .env
-const { neonApiKey, processEnvironment, neonDBConnectionTemplate, verbose } =
-    loadConfigs();
+const {
+    neonApiKey,
+    processEnvironment,
+    neonDBConnectionTemplate,
+    verbose,
+    testingDbURL,
+    localDbURL,
+    migrationsFolder,
+} = loadConfigs();
 
 if (!neonApiKey || !neonDBConnectionTemplate) {
     console.error("❗️ Missing Neon API Key. Stopping tests.");
     process.exit(-1);
 }
 
-const repository = Repository.getInstance();
-
 const { preload } = authTemplate();
-// Run post and pre
 const { setup, cleanup } = usePreload({
     env: processEnvironment,
     apiKey: neonApiKey,
@@ -45,6 +47,17 @@ afterAll(cleanup);
 */
 function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
     const { apiKey, env, verbose } = args;
+    // warmup the connections manager
+    const connection = Connections.getInstance({
+        loadConfig: () => ({
+            processEnvironment,
+            shortLivedDbUrl: testingDbURL,
+            longLivedDbUrl: localDbURL,
+            migrationsFolder,
+            verbose: verbose || false,
+        }),
+    });
+
     let branch: CreatedBranchResponse | undefined;
     let mapesaProject: NeonProject | undefined | null;
 
@@ -105,7 +118,7 @@ function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
         // connect to the database
         // eslint-disable-next-line no-unsafe-optional-chaining
         const [endpoint] = branch?.endpoints;
-        const neonDbConnection = setupNeonDatabaseConnection({
+        const neonDbConnection = connection?.getShortLivedConnection({
             overrideURL: applyNeonTemplate(neonDBConnectionTemplate!, {
                 key: "connection",
                 value: endpoint?.host,
@@ -114,7 +127,7 @@ function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
         });
 
         // run migrations
-        await migrateNeonDb({ cacheKey: "PreloadKey" }).catch((e) => {
+        neonDbConnection?.migrate().catch((e) => {
             console.error(
                 `❗️ Couldn't run migrations on Neon!Tests will continue without seed data. Chance is the data already exists\n${JSON.stringify(
                     e
@@ -123,7 +136,7 @@ function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
         });
 
         // seed the database
-        await seedTransactionTypes(neonDbConnection).catch((e) => {
+        await seedTransactionTypes(neonDbConnection?.value).catch((e) => {
             console.error(
                 `❗️Couldn't run seed the Neon DB! Tests will continue without seed data. Chance is the data already exists\n${JSON.stringify(e)}`
             );

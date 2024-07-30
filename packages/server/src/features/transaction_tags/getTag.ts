@@ -9,11 +9,8 @@ export const GetTag = new Elysia()
     .get(
         "/:id",
         async ({ user, params: { id }, body: { ids } }) => {
-            // Should return deep nests of tags with transactions
-            const res = await new TagsRepository().getTagById(user?.id!, [
-                id,
-                ...ids,
-            ]);
+            const repository = TagsRepository.getInstance();
+            const res = await repository.getTagById(user?.id!, [id, ...ids]);
             return res;
         },
         {

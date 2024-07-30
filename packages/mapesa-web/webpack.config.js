@@ -21,11 +21,6 @@ module.exports = function (env) {
                                 "@babel/preset-env",
                                 "@babel/preset-react",
                                 "@babel/preset-typescript",
-                                ...(env.production
-                                    ? []
-                                    : [
-                                          "@babel/plugin-transform-react-jsx-development",
-                                      ]),
                             ],
                         },
                     },

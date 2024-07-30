@@ -18,12 +18,29 @@ export type FindUserResponse =
 
 export class UserRepository {
     static loadDb: Props["loadDbInstance"];
+    static instance: UserRepository;
 
-    constructor(props?: Props) {
-        if (props) {
-            UserRepository.loadDb = props.loadDbInstance;
-        }
-        throw Error("Cannot invoke without init");
+    private constructor(props: Props) {
+        UserRepository.loadDb = props.loadDbInstance;
+    }
+
+    /**
+     * Get a long lived instance. If instance exists, we return that instance
+     */
+    public static getInstance(props?: Props) {
+        return (
+            UserRepository.instance ||
+            (() => {
+                if (!props) {
+                    throw new Error(
+                        "Instance doesn't not exist. Call this method with props first."
+                    );
+                }
+                const n = new UserRepository(props);
+                UserRepository.instance = n;
+                return n;
+            })()
+        );
     }
 
     async insertUser(user: NewUser): Promise<PublicUser | null> {

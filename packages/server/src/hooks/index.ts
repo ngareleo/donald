@@ -1,5 +1,5 @@
-import { Elysia, t } from "elysia";
-import { getDatabaseInstance, transactionTypeTable } from "server-repository";
+import { Elysia } from "elysia";
+import { Connections, transactionTypeTable } from "server-repository";
 import { loadConfigs } from "~/config";
 
 export const useMainApplicationErrorHandling = new Elysia().onError(
@@ -31,8 +31,9 @@ export const useApplicationConfigs = new Elysia().state(
 export const useTransactionTypes = new Elysia().state(
     "transactionTypes",
     await (async () => {
-        const db = getDatabaseInstance();
-        const types = await db.select().from(transactionTypeTable);
+        const connection = Connections.getInstance();
+        const db = connection?.getLongLivedDBConnection().value;
+        const types = await db?.select().from(transactionTypeTable);
         return types;
     })()
 );

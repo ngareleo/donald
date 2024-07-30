@@ -1,6 +1,3 @@
-// Import utils and hooks first then
-
-// Import controllers
-export * from "./authenticateUser";
-export * from "./registerUser";
-export * from "./verifyAccessToken";
+export { AuthenticateUser } from "./authenticateUser";
+export { RegisterUsers } from "./registerUser";
+export { VerifyAccessToken } from "./verifyAccessToken";

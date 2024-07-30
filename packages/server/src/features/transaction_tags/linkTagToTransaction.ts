@@ -9,11 +9,12 @@ import { t } from "elysia";
 export const LinkTagToTransaction = new Elysia().use(useAuthenticateUser).post(
     "/link",
     async ({ body, user }) => {
+        const repository = TagsRepository.getInstance();
         const payload = {
             ...body,
             userId: user?.id,
         };
-        return await new TagsRepository().linkTagToTransaction(payload);
+        return await repository.linkTagToTransaction(payload);
     },
     {
         body: t.Object({

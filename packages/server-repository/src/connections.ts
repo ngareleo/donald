@@ -5,56 +5,20 @@ import { drizzle as NeonDrizzle } from "drizzle-orm/neon-http";
 import { migrate as NeonMigrator } from "drizzle-orm/neon-http/migrator";
 import { migrate as PostgresJSMigrator } from "drizzle-orm/postgres-js/migrator";
 import * as schema from "./schema";
-
-// Todo: Decouple this file from server pkg
-
-type Config = {
-    processEnvironment: string;
-    shortLivedDbUrl: string;
-    longLivedDbUrl: string;
-    migrationsFolder: string;
-    verbose: boolean;
-};
+import type {
+    CacheDBKeyType,
+    CacheValueType,
+    Config,
+    DefaultConnectionType,
+    GenericConnectionType,
+    NeonDBType,
+    PostgresDBType,
+    PrivateConnectionType,
+} from "./types";
 
 type Props = {
     loadConfig: () => Config;
 };
-
-export type NeonDBType = ReturnType<typeof NeonDrizzle>;
-export type PostgresDBType = ReturnType<typeof PostgresJSDrizzle>;
-
-type PrivateConnectionType = {
-    key: string;
-    value: DefaultConnectionType["value"];
-    migrate: () => Promise<void>;
-};
-
-type DefaultConnectionType =
-    | { key: "ll-connection"; value: PostgresDBType }
-    | { key: "sl-connection"; value: NeonDBType };
-
-type GenericConnectionType =
-    | {
-          key: "genericShortLivedConnection";
-          value: NeonDBType;
-          migrate: () => Promise<void>;
-      }
-    | {
-          key: "genericLongLivedConnection";
-          value: PostgresDBType;
-          migrate: () => Promise<void>;
-      };
-
-export type DBConnectionType = [
-    // add keys here to cache the db and retrieve later
-    "CliDBType", // example
-    "PreloadKey",
-];
-export type CacheDBKeyType =
-    | ("testingConnection" | "prodConnection")
-    | DBConnectionType[number];
-
-export type CacheValueType = NeonDBType | PostgresDBType;
 
 export class Connections {
     /**
@@ -83,13 +47,12 @@ export class Connections {
     private static configs: Config;
     private static instance: Connections;
 
-    private static genericConnections = new Map<
-        GenericConnectionType["key"],
-        GenericConnectionType["value"]
-    >();
+    private static genericLongLivedConnection: PostgresDBType;
+    private static genericShortLivedConnection: NeonDBType;
+
     private static privateConnections = new Map();
 
-    constructor({ loadConfig }: Props) {
+    private constructor({ loadConfig }: Props) {
         Connections.loadConfig = loadConfig;
         Connections.configs = Connections.loadConfig();
     }
@@ -126,13 +89,11 @@ export class Connections {
                   key: args.cacheKey || "",
                   type: "ll-connection",
               })
-            : this.getGenericLLConnection();
+            : this.getGenericShortLivedConnection();
     }
 
     /**
      * Should open a stable direct postgres db.
-     * These are ideal for
-     * Ideal for tests.
      *
      * It takes a url or a key.
      * If its a key, it retrieves a connection.
@@ -154,7 +115,7 @@ export class Connections {
                   key: args.cacheKey || "",
                   type: "sl-connection",
               })
-            : this.getGenericSLConnection();
+            : this.getGenericLongLivedConnection();
     }
 
     /**
@@ -168,57 +129,44 @@ export class Connections {
         }
     }
 
-    private async getGenericLLConnection(): Promise<GenericConnectionType> {
+    private async getGenericLongLivedConnection(): Promise<GenericConnectionType> {
         const key = "genericLongLivedConnection" as const;
-        const cache = Connections.genericConnections.get(key);
-        const value = cache
-            ? cache
-            : (() => {
-                  const { longLivedDbUrl: url, verbose } = Connections.configs;
-                  const db = NeonDrizzle(neon(url), {
-                      schema,
-                      logger: verbose || false, // Basic logging to the stdout
-                  });
-                  Connections.log(
-                      `New connection to Neon Db established using ${url}`
-                  );
-                  Connections.genericConnections.set(key, db);
-                  return db;
-              })();
+        const value =
+            Connections.genericLongLivedConnection ||
+            (() => {
+                const { longLivedDbUrl, verbose } = Connections.configs;
+                const db = Connections.createLongLivedDbConnection(
+                    longLivedDbUrl,
+                    verbose
+                );
+                Connections.genericLongLivedConnection = db;
+                return db;
+            })();
 
-        const { migrationsFolder } = Connections.configs;
-        const migrate = async () => {
-            await PostgresJSMigrator(value, { migrationsFolder });
-            console.info("🎒 Migrations on PostgresJS Db complete");
+        return {
+            key,
+            value,
+            migrate: async () => Connections.migrateLongLivedDb(value),
         };
-
-        return { key, value, migrate };
     }
 
-    private getGenericSLConnection(): GenericConnectionType {
+    private getGenericShortLivedConnection(): GenericConnectionType {
         const key = "genericShortLivedConnection" as const;
-        const cache = Connections.genericConnections.get(key);
-        const value = cache
-            ? cache
-            : (() => {
-                  const { shortLivedDbUrl: url } = Connections.configs;
-                  const db = PostgresJSDrizzle(postgres(url), {
-                      schema,
-                  });
-                  Connections.log(
-                      `New connection to Neon Db established using ${url}`
-                  );
-                  Connections.genericConnections.set(key, db);
+        const value =
+            Connections.genericShortLivedConnection ||
+            (() => {
+                const { shortLivedDbUrl } = Connections.configs;
+                const db =
+                    Connections.createShortLivedDbConnection(shortLivedDbUrl);
+                Connections.genericShortLivedConnection = db;
+                return db;
+            })();
 
-                  return db;
-              })();
-        const { migrationsFolder } = Connections.configs;
-        const migrate = async () => {
-            await NeonMigrator(value, { migrationsFolder });
-            console.info("🎒 Migrations on NeonDB complete!");
+        return {
+            key,
+            value,
+            migrate: async () => Connections.migrateShortLivedDb(value),
         };
-
-        return { key, value, migrate };
     }
 
     private getPrivateConnection(args: {
@@ -227,54 +175,85 @@ export class Connections {
         type: DefaultConnectionType["key"];
     }): PrivateConnectionType {
         const { url, key, type } = args;
-        const { migrationsFolder } = Connections.configs;
         const cache = Connections.privateConnections.get(key);
-        const value =
-            cache || type === "sl-connection"
-                ? (() => {
-                      const { longLivedDbUrl: url, verbose } =
-                          Connections.configs;
-                      const db = NeonDrizzle(neon(url), {
-                          schema,
-                          logger: verbose || false, // Basic logging to the stdout
-                      });
-                      Connections.log(
-                          `New connection to Neon Db established using ${url}`
-                      );
-                      Connections.privateConnections.set(key, db);
-                      return db;
-                  })()
-                : (() => {
-                      const db = PostgresJSDrizzle(postgres(url), {
-                          schema,
-                      });
-                      Connections.log(
-                          `New connection to Neon Db established using ${url}`
-                      );
-                      Connections.privateConnections.set(key, db);
-
-                      return db;
-                  })();
-
-        const migrate =
-            type === "sl-connection"
-                ? async () => {
-                      await NeonMigrator(value, { migrationsFolder });
-                      console.info("🎒 Migrations on NeonDB complete!");
-                  }
-                : async () => {
-                      await PostgresJSMigrator(value, { migrationsFolder });
-                      console.info("🎒 Migrations on PostgresJS Db complete");
-                  };
+        const { verbose } = Connections.configs;
+        const value = cache
+            ? {
+                  value: cache,
+                  migrate:
+                      type === "sl-connection"
+                          ? async () =>
+                                await Connections.migrateShortLivedDb(cache)
+                          : async () =>
+                                await Connections.migrateLongLivedDb(cache),
+              }
+            : type === "sl-connection"
+              ? (() => {
+                    const db = Connections.createShortLivedDbConnection(
+                        url,
+                        verbose
+                    );
+                    Connections.privateConnections.set(key, db);
+                    return {
+                        value: db,
+                        migrate: async () =>
+                            await Connections.migrateShortLivedDb(db),
+                    };
+                })()
+              : (() => {
+                    const db = Connections.createLongLivedDbConnection(
+                        url,
+                        verbose
+                    );
+                    Connections.privateConnections.set(key, db);
+                    return {
+                        value: db,
+                        migrate: async () =>
+                            await Connections.migrateLongLivedDb(db),
+                    };
+                })();
 
         return {
+            ...value,
             key,
-            value,
-            migrate,
         };
     }
 
+    private static createShortLivedDbConnection(url: string, verbose = false) {
+        const db = NeonDrizzle(neon(url), {
+            schema,
+            logger: verbose || false, // Basic logging to the stdout
+        });
+        Connections.log(`New connection to Neon Db established using ${url}`);
+
+        return db;
+    }
+
+    private static createLongLivedDbConnection(url: string, verbose = false) {
+        const db = PostgresJSDrizzle(postgres(url), {
+            schema,
+            logger: verbose,
+        });
+        Connections.log(`New connection to Neon Db established using ${url}`);
+        return db;
+    }
+
+    private static async migrateLongLivedDb(db: PostgresDBType) {
+        const { migrationsFolder } = Connections.configs;
+        await PostgresJSMigrator(db, {
+            migrationsFolder,
+        });
+        console.info("🎒 Migrations on PostgresJS Db complete");
+    }
+
+    private static async migrateShortLivedDb(db: NeonDBType) {
+        const { migrationsFolder } = Connections.configs;
+        await NeonMigrator(db, { migrationsFolder });
+        console.info("🎒 Migrations on NeonDB complete!");
+    }
+
     /**
+     * * @ deprecated
      * Sets up a connection to the Neon Database
      * This db is for testing purposes only.
      */
@@ -308,6 +287,7 @@ export class Connections {
     }
 
     /**
+     * * @ deprecated
      * Creates a database instance, if already invoked, reuses open connection
      */
     getDatabaseInstance(): CacheValueType {
@@ -323,6 +303,7 @@ export class Connections {
     }
 
     /**
+     * * @ deprecated
      * Runs migrations on Neon db
      * For better perf run in the same process before `setupNeonDatabaseConnection`
      * because we cache the connection and this runs directly
@@ -341,6 +322,7 @@ export class Connections {
     }
 
     /**
+     * @ deprecated
      * Sets up a connection to `DB_URL` using PostgresJS.
      * Currently used for prod, dev
      */
@@ -364,9 +346,10 @@ export class Connections {
     }
 
     /**
+     * * @ deprecated
      * Runs migrations on a PostgresJS Database
      */
-    async migratePostgresDb(args: { key: string }) {
+    async migratePostgresDb() {
         const { migrationsFolder } = Connections.configs;
         const postDb = this.setupPostgresDatabaseConnection();
         await PostgresJSMigrator(postDb, { migrationsFolder });

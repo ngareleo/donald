@@ -21,13 +21,27 @@ export type InsertResponseType = {
 };
 
 export class TransactionsRepository {
-    static loadDb: Props["loadDbInstance"];
+    private static loadDb: Props["loadDbInstance"];
+    private static instance: TransactionsRepository;
 
-    constructor(props?: Props) {
-        if (props) {
-            TransactionsRepository.loadDb = props.loadDbInstance;
-        }
-        throw Error("Cannot invoke without init");
+    private constructor(props: Props) {
+        TransactionsRepository.loadDb = props.loadDbInstance;
+    }
+
+    public static getInstance(props?: Props) {
+        return (
+            TransactionsRepository.instance ||
+            (() => {
+                if (!props) {
+                    throw new Error(
+                        "Instance doesn't not exist. Call this method with props first."
+                    );
+                }
+                const n = new TransactionsRepository(props);
+                TransactionsRepository.instance = n;
+                return n;
+            })()
+        );
     }
 
     private static async insert(

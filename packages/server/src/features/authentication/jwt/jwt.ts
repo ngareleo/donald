@@ -1,6 +1,6 @@
 import * as jose from "jose";
 import type { JWTPayload } from "jose";
-import { findUserById } from "server-repository";
+import { UserRepository } from "server-repository";
 
 export type VerifyJWTResponse =
     | "Invalid"
@@ -47,6 +47,7 @@ export async function verifyJWT(
     token: string
 ): Promise<VerifyJWTResponse> {
     const pk = await jose.importSPKI(publicKey, "RS256");
+    const repository = UserRepository.getInstance();
     let payload;
 
     try {
@@ -65,7 +66,7 @@ export async function verifyJWT(
         return "Expired";
     }
 
-    const user = await findUserById(Number(payload.sub));
+    const user = await repository.findUserById(Number(payload.sub));
     if (user == null) {
         return "User not found";
     }

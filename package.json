@@ -8,6 +8,7 @@
   "scripts": {
     "build": "bun run --filter * build",
     "clean": "rm -rf node_modules",
+    "dev:server": "bun run --filter server-repository dev && bun run --filter server dev",
     "lint": "bunx eslint && bunx prettier . --find-config-path ./prettier.config.js --write",
     "start:server": "bun run --filter server start",
     "prepare": "husky"

@@ -16,8 +16,9 @@ export const UploadBatchTransactions = new Elysia()
         "/transactions",
         async ({ body, user, store: { transactionTypes } }) => {
             const { raw } = body;
+            const repository = TransactionsRepository.getInstance();
             const transactions = raw.map((transaction) => {
-                const transactionType = transactionTypes.find(
+                const transactionType = transactionTypes?.find(
                     (type) => type.name === transaction.type
                 );
                 if (!transactionType) {
@@ -38,15 +39,13 @@ export const UploadBatchTransactions = new Elysia()
                     transactionCost: Number(transaction.transactionCost),
                     transactionTypeId: transactionType.id,
                     type:
-                        transactionTypes.find(
+                        transactionTypes?.find(
                             (type) => type.name === transaction.type
                         )?.id ?? 0,
                     userId: user?.id,
                 };
             });
-            return await new TransactionsRepository().insertNewTransactions(
-                transactions
-            );
+            return await repository.insertNewTransactions(transactions);
         },
         {
             type: "application/json",
