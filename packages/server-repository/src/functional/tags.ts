@@ -15,12 +15,30 @@ type Props = {
 
 export class TagsRepository {
     static loadDb: Props["loadDbInstance"];
+    static instance: TagsRepository;
+    private constructor(props: Props) {
+        TagsRepository.loadDb = props.loadDbInstance;
+    }
 
-    constructor(props?: Props) {
-        if (props) {
-            TagsRepository.loadDb = props.loadDbInstance;
-        }
-        throw Error("Cannot invoke without init");
+    public static getInstance(props?: Props) {
+        return (
+            TagsRepository.instance ||
+            (() => {
+                if (!props) {
+                    throw new Error(
+                        "Instance doesn't not exist. Call this method with props first."
+                    );
+                }
+                const n = new TagsRepository(props);
+                TagsRepository.instance = n;
+                return n;
+            })()
+        );
+    }
+
+    public static buildInstance(props: Props) {
+        const n = new TagsRepository(props);
+        TagsRepository.instance = n;
     }
 
     async insertNewTag(payload: NewTag | NewTag[]) {

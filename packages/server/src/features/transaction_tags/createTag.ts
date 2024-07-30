@@ -15,6 +15,7 @@ export const CreateTag = new Elysia()
     .post(
         r,
         async ({ body, user }) => {
+            const repository = TagsRepository.getInstance();
             const payload = Array.isArray(body)
                 ? body.map((tag) => ({
                       ...tag,
@@ -24,7 +25,7 @@ export const CreateTag = new Elysia()
                       ...body,
                       userId: user?.id,
                   };
-            const tag = await new TagsRepository().insertNewTag(payload);
+            const tag = await repository.insertNewTag(payload);
             return { tag, message: "OK" };
         },
         {

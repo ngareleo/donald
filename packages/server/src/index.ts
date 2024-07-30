@@ -18,7 +18,7 @@ const startApplication = () => {
     } = loadConfigs();
 
     // warmup the connections manager
-    const connection = new Connections({
+    const connection = Connections.getInstance({
         loadConfig: () => {
             return {
                 processEnvironment,
@@ -32,14 +32,16 @@ const startApplication = () => {
 
     // warmup the repositories
 
-    new UserRepository({
-        loadDbInstance: () => connection.getLongLivedDBConnection().value,
+    const longLivedConnection = connection?.getLongLivedDBConnection();
+
+    UserRepository.getInstance({
+        loadDbInstance: () => longLivedConnection,
     });
-    new TagsRepository({
-        loadDbInstance: () => connection.getLongLivedDBConnection().value,
+    TagsRepository.getInstance({
+        loadDbInstance: () => longLivedConnection,
     });
-    new TransactionsRepository({
-        loadDbInstance: () => connection.getLongLivedDBConnection().value,
+    TransactionsRepository.getInstance({
+        loadDbInstance: () => longLivedConnection,
     });
 
     // checks to avoid leaking secrets unnecessary

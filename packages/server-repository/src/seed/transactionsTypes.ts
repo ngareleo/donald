@@ -1,5 +1,5 @@
 import { transactionTypeTable, type NewTransactionType } from "~/schema";
-import type { NeonDBType, PostgresDBType } from "~/setup";
+import type { NeonDBType, PostgresDBType } from "~/types";
 
 export async function seedTransactionTypes(
     dbInstance: NeonDBType | PostgresDBType

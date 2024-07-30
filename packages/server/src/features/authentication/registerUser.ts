@@ -12,13 +12,14 @@ export const RegisterUsers = new Elysia()
     .post(
         r,
         async ({ body, set }): Promise<R> => {
+            const userRepository = UserRepository.getInstance();
             const { username, password, email } = body;
             const user = {
                 username,
                 password,
                 email,
             };
-            const newUser = await new UserRepository().insertUser(user);
+            const newUser = await userRepository.insertUser(user);
             if (!newUser) {
                 set.status = 400;
                 return { message: "User already exists" };

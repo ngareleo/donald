@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
 import { bearer } from "@elysiajs/bearer";
-import { findUserById } from "server-repository";
+import { UserRepository } from "server-repository";
 import { readPemFiles, verifyJWT } from "./@utils";
 
 export const useAuthenticateUser = new Elysia()
@@ -41,12 +41,13 @@ export const useAuthenticateUser = new Elysia()
         const { bearer, store } = context;
         const { publicKey } = await store.keys();
         const payload = await verifyJWT(publicKey, bearer!);
+        const userRepository = UserRepository.getInstance();
 
         if (typeof payload === "string") {
             return {};
         }
 
-        const user = await findUserById(Number(payload.sub));
+        const user = await userRepository.findUserById(Number(payload.sub));
 
         return {
             user,
