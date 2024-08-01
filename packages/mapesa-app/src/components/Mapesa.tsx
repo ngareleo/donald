@@ -1,18 +1,28 @@
 import * as React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { LoginPage } from "./pages/Login.tsx";
-import { HomePage } from "./pages/Home.tsx";
-import { SignupPage } from "./pages/Signup.tsx";
-import { ErrorPage } from "./pages/Error.tsx";
+import {
+    createBrowserRouter,
+    redirect,
+    RouterProvider,
+} from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
+import { CookiesProvider } from "react-cookie";
+import { LoginPage } from "./pages/Login";
+import { HomePage } from "./pages/Home";
+import { SignupPage } from "./pages/Signup";
+k;
+import { ErrorPage } from "./pages/Error";
 
-type Props = {
-    children?: React.ReactNode;
+const homeLoader = async () => {
+    // do a cookie check for auth token
+    // do a synchronous server check and redirect if need
+    return redirect("/login");
 };
 
 const routes = createBrowserRouter([
     {
         path: "/",
+        // We need to do a auth redirect here before we even render the page
+        loader: homeLoader,
         Component: HomePage,
     },
     {
@@ -29,7 +39,7 @@ const routes = createBrowserRouter([
     },
 ]);
 
-export const Mapesa: React.FC<Props> = () => {
+export const Mapesa = () => {
     return (
         <ChakraProvider>
             <div
@@ -41,7 +51,9 @@ export const Mapesa: React.FC<Props> = () => {
                     height: "100vh",
                 }}
             >
-                <RouterProvider router={routes} />;
+                <CookiesProvider>
+                    <RouterProvider router={routes} />;
+                </CookiesProvider>
             </div>
         </ChakraProvider>
     );

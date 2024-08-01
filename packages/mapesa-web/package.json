@@ -3,7 +3,7 @@
   "description": "Packages that loads mapesa web app",
   "module": "src/index.ts",
   "scripts": {
-    "dev": "webpack serve",
+    "dev": "webpack serve --stats-error-details",
     "build": "webpack --env production"
   },
   "dependencies": {

@@ -1,1 +1,1 @@
-export { Mapesa as App } from "./components/Mapesa.tsx";
+export { Mapesa as App } from "./components/Mapesa";

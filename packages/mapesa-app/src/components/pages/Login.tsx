@@ -8,10 +8,64 @@ import {
     Link,
 } from "@chakra-ui/react";
 import * as React from "react";
+import { useCookies } from "react-cookie";
 
-type Props = {};
+const mainAppCookieName = "mainAppCookie";
+const twoDays = 60 * 60 * 24 * 2;
 
-export const LoginPage: React.FC<Props> = () => {
+export const LoginPage: React.FC = () => {
+    // do a auth validation
+
+    const [username, setUsername] = React.useState<string | null>(null);
+    const [password, setPassword] = React.useState<string | null>(null);
+
+    const [cookies, setCookie] = useCookies([mainAppCookieName]);
+    const userCookie = cookies["mainAppCookie"];
+    cookies.e;
+    const alreadyLoggedIn = Boolean(userCookie);
+
+    React.useEffect(() => {
+        if (userCookie) {
+        }
+    }, []);
+
+    const formSubmitHandler = React.useCallback(async () => {
+        // validate form
+        const isFormValid = Boolean(username) && Boolean(password);
+        if (!isFormValid) {
+            return;
+        }
+
+        let response;
+        try {
+            response = await fetch(
+                "https://cfe5-4-213-67-231.ngrok-free.app//users/sign-in",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        subject: username,
+                        password: password,
+                    }),
+                }
+            );
+        } catch (e) {
+            console.error(e);
+            return;
+        }
+
+        const { user, token, message } = await response.json();
+        if (message === "OK") {
+            setCookie(
+                mainAppCookieName,
+                JSON.stringify({ user, message, token }), // recommended to stringify cookie content first
+                { path: "/", maxAge: twoDays, secure: true }
+            );
+        }
+    }, [username, password]);
+
     return (
         <Flex w={"100%"} h={"100%"} align={"center"} justify={"center"}>
             <Flex
@@ -25,13 +79,23 @@ export const LoginPage: React.FC<Props> = () => {
                     <Flex gap={"10px"} direction={"column"}>
                         <FormControl>
                             <FormLabel>Username</FormLabel>
-                            <Input type={"email"} />
+                            <Input
+                                type={"email"}
+                                onChange={(e) => {
+                                    setUsername(e.currentTarget.value);
+                                }}
+                            />
                         </FormControl>
                         <FormControl>
                             <FormLabel>Password</FormLabel>
-                            <Input type={"password"} />
+                            <Input
+                                type={"password"}
+                                onChange={(e) => {
+                                    setPassword(e.currentTarget.value);
+                                }}
+                            />
                         </FormControl>
-                        <Button>Submit</Button>
+                        <Button onClick={formSubmitHandler}>Submit</Button>
                     </Flex>
                 </FormControl>
                 <Link>I don't have an account.</Link>

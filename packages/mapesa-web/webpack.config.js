@@ -9,6 +9,9 @@ module.exports = function (env) {
         output: {
             path: path.resolve(__dirname, "dist"),
         },
+        resolve: {
+            extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
         module: {
             rules: [
                 {
