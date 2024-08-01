@@ -9,7 +9,6 @@ import { CookiesProvider } from "react-cookie";
 import { LoginPage } from "./pages/Login";
 import { HomePage } from "./pages/Home";
 import { SignupPage } from "./pages/Signup";
-k;
 import { ErrorPage } from "./pages/Error";
 
 const homeLoader = async () => {
