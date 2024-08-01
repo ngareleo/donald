@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import * as React from "react";
 import { useCookies } from "react-cookie";
+import { useSecretsContext } from "../../context/SecretsProvider";
 
 const mainAppCookieName = "mainAppCookie";
 const twoDays = 60 * 60 * 24 * 2;
@@ -18,16 +19,10 @@ export const LoginPage: React.FC = () => {
 
     const [username, setUsername] = React.useState<string | null>(null);
     const [password, setPassword] = React.useState<string | null>(null);
+    const { serverUrl } = useSecretsContext();
 
     const [cookies, setCookie] = useCookies([mainAppCookieName]);
     const userCookie = cookies["mainAppCookie"];
-    cookies.e;
-    const alreadyLoggedIn = Boolean(userCookie);
-
-    React.useEffect(() => {
-        if (userCookie) {
-        }
-    }, []);
 
     const formSubmitHandler = React.useCallback(async () => {
         // validate form
@@ -38,19 +33,16 @@ export const LoginPage: React.FC = () => {
 
         let response;
         try {
-            response = await fetch(
-                "https://cfe5-4-213-67-231.ngrok-free.app//users/sign-in",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        subject: username,
-                        password: password,
-                    }),
-                }
-            );
+            response = await fetch(serverUrl || "", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    subject: username,
+                    password: password,
+                }),
+            });
         } catch (e) {
             console.error(e);
             return;

@@ -10,6 +10,7 @@ import { LoginPage } from "./pages/Login";
 import { HomePage } from "./pages/Home";
 import { SignupPage } from "./pages/Signup";
 import { ErrorPage } from "./pages/Error";
+import { SecretsProvider } from "../context/SecretsProvider";
 
 const homeLoader = async () => {
     // do a cookie check for auth token
@@ -50,9 +51,11 @@ export const Mapesa = () => {
                     height: "100vh",
                 }}
             >
-                <CookiesProvider>
-                    <RouterProvider router={routes} />;
-                </CookiesProvider>
+                <SecretsProvider>
+                    <CookiesProvider>
+                        <RouterProvider router={routes} />;
+                    </CookiesProvider>
+                </SecretsProvider>
             </div>
         </ChakraProvider>
     );
