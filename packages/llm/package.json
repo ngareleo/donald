@@ -1,0 +1,12 @@
+{
+  "name": "llm",
+  "description": "Holds our LLM server-side logic. We want to add LLM capablities to Mapesa platform.",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
