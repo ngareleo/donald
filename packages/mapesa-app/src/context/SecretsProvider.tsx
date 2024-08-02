@@ -7,7 +7,7 @@ export const SecretsContext = React.createContext<AppSecrets>({
     serverUrl: null,
 });
 
-export const useSecretsContext = () => React.useContext(SecretsContext);
+export const useSecrets = () => React.useContext(SecretsContext);
 
 export const SecretsProvider = (props: { children: React.ReactNode }) => {
     const url = process.env.SERVER_URL || null;

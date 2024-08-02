@@ -1,8 +1,8 @@
 import * as React from "react";
-import { useSecretsContext } from "../context/SecretsProvider";
+import { useSecrets } from "../context/SecretsProvider";
 import { useMainAppCookie } from "./useMainAppCookie";
 export const useLogin = () => {
-    const { serverUrl } = useSecretsContext();
+    const { serverUrl } = useSecrets();
     const { setCookie } = useMainAppCookie();
     const handleLoginRequest = React.useCallback(
         async (props: { username: string; password: string }) => {
