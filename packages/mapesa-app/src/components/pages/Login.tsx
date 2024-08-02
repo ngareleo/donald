@@ -8,21 +8,16 @@ import {
     Link,
 } from "@chakra-ui/react";
 import * as React from "react";
-import { useCookies } from "react-cookie";
 import { useSecretsContext } from "../../context/SecretsProvider";
-
-const mainAppCookieName = "mainAppCookie";
-const twoDays = 60 * 60 * 24 * 2;
+import { useMainAppCookie } from "../../hooks/useMainAppCookie";
 
 export const LoginPage: React.FC = () => {
     // do a auth validation
-
     const [username, setUsername] = React.useState<string | null>(null);
     const [password, setPassword] = React.useState<string | null>(null);
     const { serverUrl } = useSecretsContext();
 
-    const [cookies, setCookie] = useCookies([mainAppCookieName]);
-    const userCookie = cookies["mainAppCookie"];
+    const { setCookie } = useMainAppCookie();
 
     const formSubmitHandler = React.useCallback(async () => {
         // validate form
@@ -51,9 +46,7 @@ export const LoginPage: React.FC = () => {
         const { user, token, message } = await response.json();
         if (message === "OK") {
             setCookie(
-                mainAppCookieName,
-                JSON.stringify({ user, message, token }), // recommended to stringify cookie content first
-                { path: "/", maxAge: twoDays, secure: true }
+                JSON.stringify({ user, message, token }) // recommended to stringify cookie content first
             );
         }
     }, [username, password]);
