@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useSecrets } from "../context/SecretsProvider";
 import { useMainAppCookie } from "./useMainAppCookie";
+
 export const useLogin = () => {
     const { serverUrl } = useSecrets();
     const { setCookie } = useMainAppCookie();
@@ -30,7 +31,7 @@ export const useLogin = () => {
                 );
             }
         },
-        []
+        [serverUrl, setCookie]
     );
 
     return { handleLoginRequest };
