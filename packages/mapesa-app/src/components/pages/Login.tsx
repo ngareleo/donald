@@ -8,16 +8,13 @@ import {
     Link,
 } from "@chakra-ui/react";
 import * as React from "react";
-import { useSecretsContext } from "../../context/SecretsProvider";
-import { useMainAppCookie } from "../../hooks/useMainAppCookie";
+import { useLogin } from "../../hooks/useLogin";
 
 export const LoginPage: React.FC = () => {
     // do a auth validation
     const [username, setUsername] = React.useState<string | null>(null);
     const [password, setPassword] = React.useState<string | null>(null);
-    const { serverUrl } = useSecretsContext();
-
-    const { setCookie } = useMainAppCookie();
+    const { handleLoginRequest } = useLogin();
 
     const formSubmitHandler = React.useCallback(async () => {
         // validate form
@@ -25,30 +22,10 @@ export const LoginPage: React.FC = () => {
         if (!isFormValid) {
             return;
         }
-
-        let response;
-        try {
-            response = await fetch(serverUrl || "", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    subject: username,
-                    password: password,
-                }),
-            });
-        } catch (e) {
-            console.error(e);
-            return;
-        }
-
-        const { user, token, message } = await response.json();
-        if (message === "OK") {
-            setCookie(
-                JSON.stringify({ user, message, token }) // recommended to stringify cookie content first
-            );
-        }
+        handleLoginRequest({
+            username: username || "",
+            password: password || "",
+        });
     }, [username, password]);
 
     return (
