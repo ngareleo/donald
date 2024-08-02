@@ -1,18 +1,18 @@
 import * as React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { LoginPage } from "./pages/Login.tsx";
-import { HomePage } from "./pages/Home.tsx";
-import { SignupPage } from "./pages/Signup.tsx";
-import { ErrorPage } from "./pages/Error.tsx";
 import { ChakraProvider } from "@chakra-ui/react";
-
-type Props = {
-    children?: React.ReactNode;
-};
+import { CookiesProvider } from "react-cookie";
+import { LoginPage } from "./pages/Login";
+import { HomePage, loader as homeLoader } from "./pages/Home";
+import { SignupPage } from "./pages/Signup";
+import { ErrorPage } from "./pages/Error";
+import { SecretsProvider } from "../context/SecretsProvider";
 
 const routes = createBrowserRouter([
     {
         path: "/",
+        // We need to do a auth redirect here before we even render the page
+        loader: homeLoader,
         Component: HomePage,
     },
     {
@@ -29,7 +29,7 @@ const routes = createBrowserRouter([
     },
 ]);
 
-export const Mapesa: React.FC<Props> = () => {
+export const Mapesa = () => {
     return (
         <ChakraProvider>
             <div
@@ -41,7 +41,11 @@ export const Mapesa: React.FC<Props> = () => {
                     height: "100vh",
                 }}
             >
-                <RouterProvider router={routes} />;
+                <SecretsProvider>
+                    <CookiesProvider>
+                        <RouterProvider router={routes} />;
+                    </CookiesProvider>
+                </SecretsProvider>
             </div>
         </ChakraProvider>
     );

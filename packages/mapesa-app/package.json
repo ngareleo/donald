@@ -7,9 +7,13 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
-    "framer-motion": "^11.3.19",
+    "framer-motion": "^11.3.0",
+    "ky": "^1.5.0",
     "react": "^18.3.1",
-    "react-router-dom": "6"
+    "react-cookie": "^7.2.0",
+    "react-router-dom": "^6.25.0",
+    "swr": "^2.2.5",
+    "universal-cookie": "^7.2.0"
   },
   "devDependencies": {
     "@types/bun": "latest",

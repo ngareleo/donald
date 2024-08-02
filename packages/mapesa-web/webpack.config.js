@@ -1,6 +1,9 @@
 const path = require("path");
 const htmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 module.exports = function (env) {
     return {
@@ -8,6 +11,9 @@ module.exports = function (env) {
         entry: path.join(__dirname, "src", "index.jsx"),
         output: {
             path: path.resolve(__dirname, "dist"),
+        },
+        resolve: {
+            extensions: [".js", ".jsx", ".ts", ".tsx"],
         },
         module: {
             rules: [
@@ -35,6 +41,11 @@ module.exports = function (env) {
                 template: path.join(__dirname, "src", "index.html"),
             }),
             new webpack.ProgressPlugin(),
+            new webpack.DefinePlugin({
+                "process.env.SERVER_URL": JSON.stringify(
+                    process.env.SERVER_URL
+                ),
+            }),
         ],
     };
 };

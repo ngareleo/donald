@@ -3,10 +3,11 @@
   "description": "Packages that loads mapesa web app",
   "module": "src/index.ts",
   "scripts": {
-    "dev": "webpack serve",
+    "dev": "webpack serve --stats-error-details",
     "build": "webpack --env production"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "mapesa-app": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

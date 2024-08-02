@@ -1,9 +1,10 @@
-const globals = require("globals")
-const pluginJs = require("@eslint/js")
-const tseslint = require("typescript-eslint")
-const tsParser = require("@typescript-eslint/parser")
+const globals = require("globals");
+const pluginJs = require("@eslint/js");
+const tseslint = require("typescript-eslint");
+const tsParser = require("@typescript-eslint/parser");
 
 const rawConfig = {
+    extends: ["eslint:recommended", "plugin:react/recommended"],
     files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
     languageOptions: {
         parser: tsParser,
@@ -26,11 +27,11 @@ const rawConfig = {
     env: {
         browser: true,
     },
-}
+};
 
 export default [
     ...rawConfig,
     ...tseslint.configs.recommended,
     pluginJs.configs.recommended,
     { languageOptions: { globals: globals.node } },
-]
+];
