@@ -1,11 +1,5 @@
 import {
-    Alert,
-    AlertDescription,
-    AlertIcon,
-    AlertTitle,
-    Box,
     Button,
-    CloseButton,
     Flex,
     FormControl,
     FormLabel,
@@ -17,17 +11,15 @@ import {
 import * as React from "react";
 import { useLogin } from "../../hooks/useLogin";
 import { WelcomeMessage } from "../widgets/WelcomeMessage";
-
-const isUserValid = (user: any) => {
-    return true;
-};
+import { redirect } from "react-router-dom";
 
 export const LoginPage: React.FC = () => {
     // do a auth validation
-    const [username, setUsername] = React.useState<string | null>(null);
-    const [password, setPassword] = React.useState<string | null>(null);
-    const [loggedInUser, setLoggedInUser] = React.useState(null);
-    const { handleLoginRequest } = useLogin();
+    const [username, setUsername] = React.useState("");
+    const [password, setPassword] = React.useState("");
+    const [loggedInUser, setLoggedInUser] = React.useState();
+
+    const { handleLogin, isUserValid } = useLogin();
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     const formSubmitHandler = React.useCallback(async () => {
@@ -36,21 +28,17 @@ export const LoginPage: React.FC = () => {
         if (!isFormValid) {
             return;
         }
-        const data = await handleLoginRequest({
+        const { user } = await handleLogin({
             username: username || "",
             password: password || "",
         });
-        const user = JSON.parse(data?.cookie);
-
-        //////////////
-        console.log("User ", user);
-        //////////////
 
         if (!isUserValid(user)) {
             return;
         }
         setLoggedInUser(user);
         onOpen();
+        redirect("/");
     }, [username, password]);
 
     return (

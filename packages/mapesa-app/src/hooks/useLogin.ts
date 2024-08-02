@@ -1,41 +1,71 @@
 import * as React from "react";
 import { useSecrets } from "../context/SecretsProvider";
 import { useMainAppCookie } from "./useMainAppCookie";
+// import ky from "ky";
 
-const mockUser = { user: "leo", token: "12345" };
+// Todo: Get this type from Elysia using EdenTreaty https://elysiajs.com/eden/treaty/overview.html
+type ServerResponseType = {
+    user?: {
+        email: string;
+        username: string;
+        id: string;
+        phoneNumber: string;
+        dateAdded: string;
+        lastModified: string;
+    };
+    token?: string;
+    message: string;
+};
+
+const mockSuccessServerResponse: ServerResponseType = {
+    user: {
+        email: "leo@gmail.com",
+        username: "leo",
+        id: "1",
+        phoneNumber: "0723432432423",
+        dateAdded: Date.now.toString(),
+        lastModified: Date.now.toString(),
+    },
+    token: "12345",
+    message: "OK",
+};
+
 export const useLogin = () => {
     const { serverUrl } = useSecrets();
-    const { setCookie, cookies } = useMainAppCookie();
-    const handleLoginRequest = React.useCallback(
+    const { setCookie } = useMainAppCookie();
+    const handleLogin = React.useCallback(
         async (props: { username: string; password: string }) => {
-            let response;
-            try {
-                response = await fetch(serverUrl || "", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        subject: props.username,
-                        password: props.password,
-                    }),
-                });
-            } catch (e) {
-                console.error(e);
-                return;
-            }
+            /////////////////////////////////////
+            console.log("Props received ", props);
+            /////////////////////////////////////
 
-            const { message } = await response.json();
-            if (message === "OK") {
+            // Todo: Will do this in a follow up after server is hoisted and ready
+
+            // const response = await ky
+            //     .post(serverUrl || "", {
+            //         json: {
+            //             subject: props.username,
+            //             password: props.password,
+            //         },
+            //     })
+            //     .json<ServerResponseType>();
+            // const { message } = response;
+
+            if (true) {
                 setCookie(
-                    JSON.stringify({ ...mockUser }) // recommended to stringify cookie content first
+                    JSON.stringify({ ...mockSuccessServerResponse }) // It's recommended to stringify cookie content first
                 );
             }
-
-            return { user: mockUser, cookie: cookies.mainAppCookie };
+            return {
+                user: mockSuccessServerResponse,
+            };
         },
         [serverUrl, setCookie]
     );
 
-    return { handleLoginRequest };
+    const isUserValid = React.useCallback((user: any) => {
+        return true;
+    }, []);
+
+    return { handleLogin, isUserValid };
 };

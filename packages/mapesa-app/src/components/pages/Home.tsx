@@ -1,9 +1,8 @@
 import {
     Badge,
-    Box,
+    Button,
     Flex,
     Heading,
-    Link,
     Table,
     TableCaption,
     TableContainer,
@@ -14,8 +13,31 @@ import {
     Thead,
 } from "@chakra-ui/react";
 import * as React from "react";
+import {
+    mainAppCookieName,
+    useMainAppCookie,
+} from "../../hooks/useMainAppCookie";
+import Cookies from "universal-cookie";
+import { redirect } from "react-router-dom";
+
+export const loader = async () => {
+    const cookie = new Cookies(null);
+    const mainAppCookie = cookie.get(mainAppCookieName);
+    if (mainAppCookie) {
+        return mainAppCookie.user;
+    } else {
+        return redirect("/login");
+    }
+};
 
 export const HomePage = () => {
+    const { cookie, removeCookie } = useMainAppCookie();
+    const username = cookie?.["username"];
+    const handleLogout = React.useCallback(() => {
+        removeCookie();
+        redirect("/login");
+    }, [removeCookie, redirect]);
+
     return (
         <Flex p={"50px"} direction={"column"} align={"center"} gap={"50px"}>
             <Flex
@@ -26,7 +48,10 @@ export const HomePage = () => {
                 justify={"space-between"}
             >
                 <Heading as={"h2"}>Mapesa</Heading>
-                <Link href="/logout">Logout</Link>
+                <Flex>
+                    {username && <Text>{username}</Text>}
+                    <Button onClick={handleLogout}>Logout</Button>
+                </Flex>
             </Flex>
             <Flex w={"full"}>
                 <TableContainer>
