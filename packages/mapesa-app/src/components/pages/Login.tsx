@@ -11,7 +11,7 @@ import {
 import * as React from "react";
 import { useLogin } from "../../hooks/useLogin";
 import { WelcomeMessage } from "../widgets/WelcomeMessage";
-import { redirect } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 
 export const LoginPage: React.FC = () => {
     // do a auth validation
@@ -21,6 +21,7 @@ export const LoginPage: React.FC = () => {
 
     const { handleLogin, isUserValid } = useLogin();
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const navigate = useNavigate();
 
     const formSubmitHandler = React.useCallback(async () => {
         // validate form
@@ -38,7 +39,7 @@ export const LoginPage: React.FC = () => {
         }
         setLoggedInUser(user);
         onOpen();
-        redirect("/");
+        navigate("/");
     }, [username, password]);
 
     return (

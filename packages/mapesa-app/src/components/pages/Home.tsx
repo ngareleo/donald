@@ -18,7 +18,7 @@ import {
     useMainAppCookie,
 } from "../../hooks/useMainAppCookie";
 import Cookies from "universal-cookie";
-import { redirect } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 
 export const loader = async () => {
     const cookie = new Cookies(null);
@@ -32,10 +32,12 @@ export const loader = async () => {
 
 export const HomePage = () => {
     const { cookie, removeCookie } = useMainAppCookie();
+    const navigate = useNavigate();
+
     const username = cookie?.["username"];
     const handleLogout = React.useCallback(() => {
         removeCookie();
-        redirect("/login");
+        navigate("/login");
     }, [removeCookie, redirect]);
 
     return (
