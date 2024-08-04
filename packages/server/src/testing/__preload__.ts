@@ -48,7 +48,7 @@ afterAll(cleanup);
 function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
     const { apiKey, env, verbose } = args;
     // warmup the connections manager
-    const connection = Connections.getInstance({
+    const connection = new Connections({
         loadConfig: () => ({
             processEnvironment,
             shortLivedDbUrl: testingDbURL,
@@ -127,7 +127,7 @@ function usePreload(args: { apiKey: string; env: EnvVars; verbose?: boolean }) {
         });
 
         // run migrations
-        neonDbConnection?.migrate().catch((e) => {
+        await neonDbConnection?.migrate().catch((e) => {
             console.error(
                 `❗️ Couldn't run migrations on Neon!Tests will continue without seed data. Chance is the data already exists\n${JSON.stringify(
                     e

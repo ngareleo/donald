@@ -1,25 +1,20 @@
 import Elysia from "elysia";
 import bearer from "@elysiajs/bearer";
 import { verifyJWT, readPemFiles } from "./@utils";
+import { useAuthenticateUser } from "./@hooks";
 
 export const r = "/verify";
-export type Returns = "OK" | "FAIL";
+
+export type R = "OK" | "FAIL";
 
 export const VerifyAccessToken = new Elysia()
+    .use(useAuthenticateUser)
     .use(bearer())
     .state("keys", readPemFiles)
-    .get(r, async ({ bearer, set, store: { keys } }): Promise<Returns> => {
-        if (!bearer) {
-            set.status = 400;
-            set.headers["WWW-Authenticate"] =
-                `Bearer realm='sign', error="invalid_request"`;
-
-            return "FAIL";
-        }
-
-        const { publicKey } = await keys();
-        const payload = await verifyJWT(publicKey, bearer);
-
+    .get(r, async (context): Promise<R> => {
+        const { bearer, set, store } = context;
+        const { publicKey } = await store.keys();
+        const payload = await verifyJWT(publicKey, bearer || "");
         if (typeof payload === "string") {
             set.status = 400;
             set.headers["WWW-Authenticate"] =
@@ -31,6 +26,5 @@ export const VerifyAccessToken = new Elysia()
                     return "FAIL";
             }
         }
-
         return "OK";
     });

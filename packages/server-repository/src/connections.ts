@@ -52,16 +52,9 @@ export class Connections {
 
     private static privateConnections = new Map();
 
-    private constructor({ loadConfig }: Props) {
+    constructor({ loadConfig }: Props) {
         Connections.loadConfig = loadConfig;
         Connections.configs = Connections.loadConfig();
-    }
-
-    public static getInstance(props?: Props): Connections | null {
-        if (!Connections.instance && props) {
-            Connections.instance = new Connections(props);
-        }
-        return Connections.instance;
     }
 
     /**
@@ -104,7 +97,7 @@ export class Connections {
      *
      * No key or url is provided, it provides a generic open neon db connection.
      * This generic connection is reused, unless closed.
-     */
+     * */
     getLongLivedDBConnection(args?: {
         overrideURL?: string;
         cacheKey?: CacheDBKeyType;
@@ -129,7 +122,7 @@ export class Connections {
         }
     }
 
-    private async getGenericLongLivedConnection(): Promise<GenericConnectionType> {
+    private getGenericLongLivedConnection(): GenericConnectionType {
         const key = "genericLongLivedConnection" as const;
         const value =
             Connections.genericLongLivedConnection ||
@@ -253,7 +246,7 @@ export class Connections {
     }
 
     /**
-     * * @ deprecated
+     * @deprecated
      * Sets up a connection to the Neon Database
      * This db is for testing purposes only.
      */
@@ -287,7 +280,7 @@ export class Connections {
     }
 
     /**
-     * * @ deprecated
+     * @deprecated
      * Creates a database instance, if already invoked, reuses open connection
      */
     getDatabaseInstance(): CacheValueType {
@@ -303,7 +296,7 @@ export class Connections {
     }
 
     /**
-     * * @ deprecated
+     * @deprecated
      * Runs migrations on Neon db
      * For better perf run in the same process before `setupNeonDatabaseConnection`
      * because we cache the connection and this runs directly
@@ -322,7 +315,7 @@ export class Connections {
     }
 
     /**
-     * @ deprecated
+     * @deprecated
      * Sets up a connection to `DB_URL` using PostgresJS.
      * Currently used for prod, dev
      */
@@ -346,7 +339,7 @@ export class Connections {
     }
 
     /**
-     * * @ deprecated
+     * @deprecated
      * Runs migrations on a PostgresJS Database
      */
     async migratePostgresDb() {

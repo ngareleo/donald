@@ -2,37 +2,35 @@ import { Elysia } from "elysia";
 import { Connections, transactionTypeTable } from "server-repository";
 import { loadConfigs } from "~/config";
 
-export const useMainApplicationErrorHandling = new Elysia().onError(
-    ({ code, error, set }) => {
-        if (code === "VALIDATION") {
-            console.error(error);
-        }
-        switch (code) {
-            case "NOT_FOUND":
-                set.status = 404;
-                return "Not Found :(";
+export const useApplicationConfigs = new Elysia({
+    name: "useApplicationConfigs",
+}).state("config", loadConfigs());
 
-            case "INTERNAL_SERVER_ERROR":
-                set.status = 500;
-                return "Internal Server Error :(";
-
-            default:
-                set.status = 400;
-                return "Bad Request :(";
-        }
-    }
-);
-
-export const useApplicationConfigs = new Elysia().state(
-    "config",
-    loadConfigs()
-);
-
-export const useTransactionTypes = new Elysia().state(
+export const useTransactionTypes = new Elysia({
+    name: "useTransactionTypes",
+}).state(
     "transactionTypes",
     await (async () => {
-        const connection = Connections.getInstance();
-        const db = connection?.getLongLivedDBConnection().value;
+        const {
+            processEnvironment,
+            localDbURL,
+            testingDbURL,
+            migrationsFolder,
+            verbose,
+        } = loadConfigs();
+
+        const connection = new Connections({
+            loadConfig: () => {
+                return {
+                    processEnvironment,
+                    shortLivedDbUrl: testingDbURL,
+                    longLivedDbUrl: localDbURL,
+                    migrationsFolder,
+                    verbose,
+                };
+            },
+        });
+        const db = connection?.getLongLivedDBConnection()?.value;
         const types = await db?.select().from(transactionTypeTable);
         return types;
     })()

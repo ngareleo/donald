@@ -1,7 +1,9 @@
 import Elysia, { t } from "elysia";
-import { TransactionsRepository } from "server-repository";
 import { useTransactionTypes } from "~/hooks";
 import { useAuthenticateUser } from "~/features/authentication/@hooks";
+import { loadRepository } from "~/internals/repository";
+
+const { transactionsRepository } = loadRepository();
 
 /**
  * Receives a payload of transactions uploads the payload atomically
@@ -10,15 +12,16 @@ import { useAuthenticateUser } from "~/features/authentication/@hooks";
  * @returns {status: OKAY or FAIL, reason?: "Reason for failure if status is FAIL"}
  */
 export const UploadBatchTransactions = new Elysia()
+    .decorate("repository", transactionsRepository)
     .use(useAuthenticateUser)
     .use(useTransactionTypes)
     .post(
         "/transactions",
-        async ({ body, user, store: { transactionTypes } }) => {
+        async (context) => {
+            const { body, user, store, repository } = context;
             const { raw } = body;
-            const repository = TransactionsRepository.getInstance();
             const transactions = raw.map((transaction) => {
-                const transactionType = transactionTypes?.find(
+                const transactionType = store.transactionTypes?.find(
                     (type) => type.name === transaction.type
                 );
                 if (!transactionType) {
@@ -39,13 +42,16 @@ export const UploadBatchTransactions = new Elysia()
                     transactionCost: Number(transaction.transactionCost),
                     transactionTypeId: transactionType.id,
                     type:
-                        transactionTypes?.find(
+                        store.transactionTypes?.find(
                             (type) => type.name === transaction.type
                         )?.id ?? 0,
                     userId: user?.id,
                 };
             });
-            return await repository.insertNewTransactions(transactions);
+
+            const transaction =
+                await repository?.insertNewTransactions(transactions);
+            return transaction;
         },
         {
             type: "application/json",

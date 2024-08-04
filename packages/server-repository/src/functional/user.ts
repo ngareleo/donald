@@ -1,10 +1,6 @@
 import { eq } from "drizzle-orm";
-import {
-    usersTable,
-    type NeonDBType,
-    type NewUser,
-    type PostgresDBType,
-} from "..";
+import { usersTable, type NewUser } from "..";
+import type { NeonDBType, PostgresDBType } from "~/types";
 
 type Props = {
     loadDbInstance: () => NeonDBType | PostgresDBType;
@@ -18,35 +14,15 @@ export type FindUserResponse =
 
 export class UserRepository {
     static loadDb: Props["loadDbInstance"];
-    static instance: UserRepository;
 
-    private constructor(props: Props) {
+    constructor(props: Props) {
         UserRepository.loadDb = props.loadDbInstance;
     }
 
-    /**
-     * Get a long lived instance. If instance exists, we return that instance
-     */
-    public static getInstance(props?: Props) {
-        return (
-            UserRepository.instance ||
-            (() => {
-                if (!props) {
-                    throw new Error(
-                        "Instance doesn't not exist. Call this method with props first."
-                    );
-                }
-                const n = new UserRepository(props);
-                UserRepository.instance = n;
-                return n;
-            })()
-        );
-    }
-
     async insertUser(user: NewUser): Promise<PublicUser | null> {
-        const db = UserRepository.loadDb();
+        const instance = UserRepository.loadDb();
         const hash = Bun.password.hashSync(user.password);
-        const [res] = await db
+        const [res] = await instance
             .insert(usersTable)
             .values({ ...user, password: hash })
             .returning({
@@ -57,7 +33,6 @@ export class UserRepository {
                 dateAdded: usersTable.dateAdded,
                 lastModified: usersTable.lastModified,
             });
-
         return res;
     }
 

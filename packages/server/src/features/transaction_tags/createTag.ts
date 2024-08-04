@@ -1,21 +1,21 @@
 import Elysia from "elysia";
 import { useTransactionTypes } from "~/hooks";
-import { TagsRepository } from "server-repository";
 import { useAuthenticateUser } from "~/features/authentication/@hooks";
 import { t } from "elysia";
+import { loadRepository } from "~/internals/repository";
 
 export const r = "/";
 
-/**
- * Creates a new Tag in `tags` table.
- */
+const { tagsRepository } = loadRepository();
+
 export const CreateTag = new Elysia()
+    .decorate("repository", tagsRepository)
     .use(useAuthenticateUser)
     .use(useTransactionTypes)
     .post(
         r,
-        async ({ body, user }) => {
-            const repository = TagsRepository.getInstance();
+        async (context) => {
+            const { body, user, repository } = context;
             const payload = Array.isArray(body)
                 ? body.map((tag) => ({
                       ...tag,
@@ -25,7 +25,7 @@ export const CreateTag = new Elysia()
                       ...body,
                       userId: user?.id,
                   };
-            const tag = await repository.insertNewTag(payload);
+            const tag = await repository?.insertNewTag(payload);
             return { tag, message: "OK" };
         },
         {

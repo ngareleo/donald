@@ -1,25 +1,28 @@
 import Elysia from "elysia";
-import { TagsRepository } from "server-repository";
 import { useAuthenticateUser } from "~/features/authentication/@hooks";
 import { t } from "elysia";
+import { loadRepository } from "~/internals/repository";
 
-/**
- * Link to a tag to an existing transaction
- */
-export const LinkTagToTransaction = new Elysia().use(useAuthenticateUser).post(
-    "/link",
-    async ({ body, user }) => {
-        const repository = TagsRepository.getInstance();
-        const payload = {
-            ...body,
-            userId: user?.id,
-        };
-        return await repository.linkTagToTransaction(payload);
-    },
-    {
-        body: t.Object({
-            tagId: t.Number(),
-            transactionId: t.Number(),
-        }),
-    }
-);
+const { tagsRepository } = loadRepository();
+
+export const LinkTagToTransaction = new Elysia()
+    .decorate("repository", tagsRepository)
+    .use(useAuthenticateUser)
+    .post(
+        "/link",
+        async (context) => {
+            const { body, user, repository } = context;
+
+            const payload = {
+                ...body,
+                userId: user?.id,
+            };
+            return await repository?.linkTagToTransaction(payload);
+        },
+        {
+            body: t.Object({
+                tagId: t.Number(),
+                transactionId: t.Number(),
+            }),
+        }
+    );
