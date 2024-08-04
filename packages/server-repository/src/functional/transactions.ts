@@ -22,26 +22,9 @@ export type InsertResponseType = {
 
 export class TransactionsRepository {
     private static loadDb: Props["loadDbInstance"];
-    private static instance: TransactionsRepository;
 
-    private constructor(props: Props) {
+    constructor(props: Props) {
         TransactionsRepository.loadDb = props.loadDbInstance;
-    }
-
-    public static getInstance(props?: Props) {
-        return (
-            TransactionsRepository.instance ||
-            (() => {
-                if (!props) {
-                    throw new Error(
-                        "Instance doesn't not exist. Call this method with props first."
-                    );
-                }
-                const n = new TransactionsRepository(props);
-                TransactionsRepository.instance = n;
-                return n;
-            })()
-        );
     }
 
     private static async insert(

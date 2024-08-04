@@ -1,16 +1,22 @@
 import Elysia, { t } from "elysia";
 import { useTransactionTypes } from "~/hooks";
 import { useAuthenticateUser } from "~/features/authentication/@hooks";
-import { TagsRepository } from "server-repository";
+import { loadRepository } from "~/internals/repository";
+
+const { tagsRepository } = loadRepository();
 
 export const GetTag = new Elysia()
+    .decorate("repository", tagsRepository)
     .use(useAuthenticateUser)
     .use(useTransactionTypes)
     .get(
         "/:id",
-        async ({ user, params: { id }, body: { ids } }) => {
-            const repository = TagsRepository.getInstance();
-            const res = await repository.getTagById(user?.id!, [id, ...ids]);
+        async (context) => {
+            const { user, params, body, repository } = context;
+            const res = await repository?.getTagById(user?.id!, [
+                ...(params.id ? [params?.id] : []),
+                ...(body?.ids || []),
+            ]);
             return res;
         },
         {

@@ -39,7 +39,6 @@ export function loadConfigs(): ApplicationConfigs {
     const migrationsFolder = process.env.MIGRATIONS_FOLDER;
     const neonDBConnectionTemplate = process.env.NEON_DB_CONNECTION_TEMPLATE;
     const verbose = process.env.VERBOSE;
-
     const basic = {
         migrationsFolder,
         processEnvironment,
@@ -47,24 +46,20 @@ export function loadConfigs(): ApplicationConfigs {
         testingDbURL,
         verbose: stringToBoolean(verbose),
     };
-
     if (!processEnvironment) {
         console.error(
             "⛔️ Missing process environment. Add ENV=dev|test|prod "
         );
         process.exit(-1);
     }
-
     if (processEnvironment === "test") {
         const testConfigs = {
             ...basic,
             neonApiKey: process.env.NEON_API_KEY,
             neonDBConnectionTemplate,
         };
-
         console.info("🌥️ Test env configs loaded ", verbose ? testConfigs : "");
         return testConfigs;
     }
-
     return basic;
 }

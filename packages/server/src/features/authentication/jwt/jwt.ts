@@ -1,28 +1,14 @@
 import * as jose from "jose";
 import type { JWTPayload } from "jose";
-import { UserRepository } from "server-repository";
+import { loadRepository } from "~/internals/repository";
+
+const { userRepository } = loadRepository();
 
 export type VerifyJWTResponse =
     | "Invalid"
     | "Expired"
     | "User not found"
     | JWTPayload;
-
-export type UploadTransactionDTO = {
-    agentNumber?: string | null;
-    balance: number;
-    dateTime: string;
-    interest?: number;
-    location: string | null;
-    messageId: string;
-    transactionCode: string;
-    transactionAmount: number;
-    subject: string | null;
-    subjectPhoneNumber?: string | null;
-    subjectAccount: string | null;
-    transactionCost: number | null;
-    type: string;
-};
 
 export async function readPemFiles() {
     return {
@@ -47,12 +33,11 @@ export async function verifyJWT(
     token: string
 ): Promise<VerifyJWTResponse> {
     const pk = await jose.importSPKI(publicKey, "RS256");
-    const repository = UserRepository.getInstance();
     let payload;
 
     try {
-        const { payload: pl } = await jose.jwtVerify<JWTPayload>(token, pk);
-        payload = pl;
+        const josePayload = await jose.jwtVerify<JWTPayload>(token, pk);
+        payload = josePayload.payload;
     } catch (e) {
         console.error(e);
         return "Invalid";
@@ -60,16 +45,13 @@ export async function verifyJWT(
 
     if (!payload || !payload.exp || !payload.sub) {
         return "Invalid";
-    }
-
-    if (payload.exp * 1000 <= Date.now()) {
+    } else if (payload.exp * 1000 <= Date.now()) {
         return "Expired";
+    } else {
+        const user = await userRepository?.findUserById(Number(payload.sub));
+        if (user == null) {
+            return "User not found";
+        }
+        return payload;
     }
-
-    const user = await repository.findUserById(Number(payload.sub));
-    if (user == null) {
-        return "User not found";
-    }
-
-    return payload;
 }
