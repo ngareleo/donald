@@ -1,4 +1,7 @@
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
+import postgres from "postgres";
+import * as schema from "../schema";
+import { drizzle as PostgresJSDrizzle } from "drizzle-orm/postgres-js";
 import { usersTable, type NewUser } from "..";
 import type { NeonDBType, PostgresDBType } from "~/types";
 
@@ -14,33 +17,48 @@ export type FindUserResponse =
 
 export class UserRepository {
     static loadDb: Props["loadDbInstance"];
+    static dbInstance: ReturnType<typeof PostgresJSDrizzle>;
 
     constructor(props: Props) {
         UserRepository.loadDb = props.loadDbInstance;
     }
 
+    /*
+    We have an issue at the moment with opening these db connection within our current architecture
+    This setup gurantees normal operation in dev/prod environment
+    However, tests are broken. Good thing we have a foundation and we don't need
+    tests at this stage of development. So ignore this for now.
+    
+    Todo: Will fix above when we reach a stage where tests are needed
+    */
+    private static loadDbInstance() {
+        if (UserRepository.dbInstance) {
+            return UserRepository.dbInstance;
+        }
+        UserRepository.dbInstance = PostgresJSDrizzle(
+            postgres(process.env.DB_URL),
+            {
+                schema,
+            }
+        );
+        return UserRepository.dbInstance;
+    }
+
     async insertUser(user: NewUser): Promise<PublicUser | null> {
-        const instance = UserRepository.loadDb();
+        const db = UserRepository.loadDbInstance();
         const hash = Bun.password.hashSync(user.password);
-        const [res] = await instance
+        const [res] = await db
             .insert(usersTable)
             .values({ ...user, password: hash })
-            .returning({
-                id: usersTable.id,
-                username: usersTable.username,
-                email: usersTable.email,
-                phoneNumber: usersTable.phoneNumber,
-                dateAdded: usersTable.dateAdded,
-                lastModified: usersTable.lastModified,
-            });
+            .returning();
         return res;
     }
 
     async findUserByUsername(
         subject: string,
         pass: string
-    ): Promise<FindUserResponse> {
-        const db = UserRepository.loadDb();
+    ): Promise<FindUserResponse | null> {
+        const db = UserRepository.loadDbInstance();
         const [res] = await db
             .select({
                 id: usersTable.id,
@@ -52,7 +70,12 @@ export class UserRepository {
                 password: usersTable.password,
             })
             .from(usersTable)
-            .where(eq(usersTable.username, subject)); // should not return more than one user
+            .where(
+                or(
+                    eq(usersTable.username, subject),
+                    eq(usersTable.email, subject)
+                )
+            );
         if (!res) {
             return "user_not_found";
         } else if (!Bun.password.verifySync(pass, res.password)) {
@@ -63,7 +86,7 @@ export class UserRepository {
     }
 
     async findUserById(id: number) {
-        const db = UserRepository.loadDb();
+        const db = UserRepository.loadDbInstance();
         const [res] = await db
             .select({
                 id: usersTable.id,
@@ -82,7 +105,7 @@ export class UserRepository {
     }
 
     async deleteUser(id: number) {
-        const db = UserRepository.loadDb();
+        const db = UserRepository.loadDbInstance();
         return await db
             .delete(usersTable)
             .where(eq(usersTable.id, id))

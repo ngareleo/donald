@@ -1,9 +1,8 @@
-import {
-    type NeonDBType,
-    type NewTransaction,
-    type PostgresDBType,
-    transactionsTable,
-} from "..";
+import type { NeonDBType, PostgresDBType } from "~/types";
+import { type NewTransaction, transactionsTable } from "..";
+import postgres from "postgres";
+import { drizzle as PostgresJSDrizzle } from "drizzle-orm/postgres-js";
+import * as schema from "../schema";
 
 type Props = {
     loadDbInstance: () => NeonDBType | PostgresDBType;
@@ -22,15 +21,37 @@ export type InsertResponseType = {
 
 export class TransactionsRepository {
     private static loadDb: Props["loadDbInstance"];
+    static dbInstance: ReturnType<typeof PostgresJSDrizzle>;
 
     constructor(props: Props) {
         TransactionsRepository.loadDb = props.loadDbInstance;
     }
 
+    /*
+    We have an issue at the moment with opening these db connection within our current architecture
+    This setup gurantees normal operation in dev/prod environment
+    However, tests are broken. Good thing we have a foundation and we don't need
+    tests at this stage of development. So ignore this for now.
+    
+    Todo: Will fix above when we reach a stage where tests are needed
+    */
+    private static loadDbInstance() {
+        if (TransactionsRepository.dbInstance) {
+            return TransactionsRepository.dbInstance;
+        }
+        TransactionsRepository.dbInstance = PostgresJSDrizzle(
+            postgres(process.env.DB_URL),
+            {
+                schema,
+            }
+        );
+        return TransactionsRepository.dbInstance;
+    }
+
     private static async insert(
         transaction: NewTransaction
     ): Promise<InsertResponseType> {
-        const db = TransactionsRepository.loadDb();
+        const db = TransactionsRepository.loadDbInstance();
         /// Inserts a single transaction and returns partial of the value
         let newTransaction;
         try {
@@ -53,7 +74,7 @@ export class TransactionsRepository {
                     "duplicate key value violates unique constraint"
                 )
             ) {
-                // TODO: Get the constraint that was violated and match to attribute
+                // Todo: Get the constraint that was violated and match to attribute
                 console.log("Duplicate key value violates unique constraint");
                 return { message: "duplicate" as const, payload: transaction };
             }
@@ -63,14 +84,11 @@ export class TransactionsRepository {
             console.log("Unknown error, Check logs.");
             return { message: "unknown" as const };
         }
-
         return { message: "success" as const, value: newTransaction[0] };
     }
 
     async insertNewTransactions(transactions: NewTransaction[]) {
         const insertTimingKey = `inserting ${transactions.length} transactions`;
-        const db = TransactionsRepository.loadDb();
-
         console.time(insertTimingKey);
         const res = await Promise.all(
             transactions.map(async (transaction) => {

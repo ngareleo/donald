@@ -2,14 +2,6 @@ import * as jose from "jose";
 import type { JWTPayload } from "jose";
 import { loadRepository } from "~/internals/repository";
 
-const { userRepository } = loadRepository();
-
-export type VerifyJWTResponse =
-    | "Invalid"
-    | "Expired"
-    | "User not found"
-    | JWTPayload;
-
 export async function readPemFiles() {
     return {
         publicKey: await Bun.file("./temp/public_key.pem").text(),
@@ -28,29 +20,35 @@ export async function getJWT(privateKey: string, userId: string) {
     return jwt;
 }
 
+export type VerifyJWTResponse =
+    | "invalid_token"
+    | "expired_token"
+    | "user_not_found"
+    | JWTPayload;
+
 export async function verifyJWT(
     publicKey: string,
     token: string
 ): Promise<VerifyJWTResponse> {
+    const { userRepository } = loadRepository();
     const pk = await jose.importSPKI(publicKey, "RS256");
     let payload;
-
     try {
         const josePayload = await jose.jwtVerify<JWTPayload>(token, pk);
         payload = josePayload.payload;
     } catch (e) {
         console.error(e);
-        return "Invalid";
+        return "invalid_token";
     }
 
     if (!payload || !payload.exp || !payload.sub) {
-        return "Invalid";
+        return "invalid_token";
     } else if (payload.exp * 1000 <= Date.now()) {
-        return "Expired";
+        return "expired_token";
     } else {
         const user = await userRepository?.findUserById(Number(payload.sub));
         if (user == null) {
-            return "User not found";
+            return "user_not_found";
         }
         return payload;
     }

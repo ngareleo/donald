@@ -5,7 +5,7 @@ import { useAuthenticateUser } from "./@hooks";
 
 export const r = "/verify";
 
-export type R = "OK" | "FAIL";
+export type R = { response: "OK" } | { response: "FAIL"; reason: string };
 
 export const VerifyAccessToken = new Elysia()
     .use(useAuthenticateUser)
@@ -20,11 +20,11 @@ export const VerifyAccessToken = new Elysia()
             set.headers["WWW-Authenticate"] =
                 `Bearer realm='sign', error="invalid_token"`;
             switch (payload) {
-                case "Invalid":
-                case "Expired":
-                case "User not found":
-                    return "FAIL";
+                case "invalid_token":
+                case "expired_token":
+                case "user_not_found":
+                    return { response: "FAIL", reason: payload };
             }
         }
-        return "OK";
+        return { response: "OK" };
     });

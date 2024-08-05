@@ -1,4 +1,7 @@
 import { and, eq } from "drizzle-orm";
+import postgres from "postgres";
+import * as schema from "../schema";
+import { drizzle as PostgresJSDrizzle } from "drizzle-orm/postgres-js";
 import {
     transactionTagsTable,
     transactionsTable,
@@ -15,13 +18,36 @@ type Props = {
 export class TagsRepository {
     static loadDb: Props["loadDbInstance"];
 
+    static dbInstance: ReturnType<typeof PostgresJSDrizzle>;
+
     constructor(props: Props) {
         TagsRepository.loadDb = props.loadDbInstance;
     }
 
+    /*
+    We have an issue at the moment with opening these db connection within our current architecture
+    This setup gurantees normal operation in dev/prod environment
+    However, tests are broken. Good thing we have a foundation and we don't need
+    tests at this stage of development. So ignore this for now.
+    
+    Todo: Will fix above when we reach a stage where tests are needed
+    */
+    private static loadDbInstance() {
+        if (TagsRepository.dbInstance) {
+            return TagsRepository.dbInstance;
+        }
+        TagsRepository.dbInstance = PostgresJSDrizzle(
+            postgres(process.env.DB_URL),
+            {
+                schema,
+            }
+        );
+        return TagsRepository.dbInstance;
+    }
+
     async insertNewTag(payload: NewTag | NewTag[]) {
         const pa = Array.isArray(payload) ? payload : [payload];
-        const db = TagsRepository.loadDb();
+        const db = TagsRepository.loadDbInstance();
         // ignore the error below
         return await db?.insert(tagsTable).values(pa).returning({
             id: tagsTable.id,
@@ -31,7 +57,7 @@ export class TagsRepository {
     }
 
     async linkTagToTransaction(payload: NewTransactionTag) {
-        const db = TagsRepository.loadDb();
+        const db = TagsRepository.loadDbInstance();
         // ignore the error below
         return await db
             ?.insert(transactionTagsTable)
@@ -60,7 +86,7 @@ export class TagsRepository {
     }
 
     async getTagById(userId: number, tagId: Array<number>) {
-        const db = TagsRepository.loadDb();
+        const db = TagsRepository.loadDbInstance();
         return await Promise.all(
             tagId.map(async (id) => {
                 return await db

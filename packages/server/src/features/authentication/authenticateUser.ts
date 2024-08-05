@@ -32,9 +32,11 @@ export const AuthenticateUser = new Elysia()
                 subject,
                 password
             );
-            if (typeof response === "string") {
+            if (!response || typeof response === "string") {
                 set.status = 400;
-                return { message: response };
+                return {
+                    message: response || "something_went_wrong_server_side",
+                };
             }
             const { privateKey } = await store.keys();
             const token = await getJWT(privateKey, String(response?.id));

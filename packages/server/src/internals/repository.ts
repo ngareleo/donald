@@ -37,17 +37,17 @@ const connection = new Connections({
 export function loadRepository() {
     const longLivedConnection = connection?.getLongLivedDBConnection();
     const { tagsRepository, userRepository, transactionsRepository } = cache;
-    if (tagsRepository) {
+    if (!tagsRepository) {
         cache.tagsRepository = new TagsRepository({
             loadDbInstance: () => longLivedConnection,
         });
     }
-    if (userRepository) {
+    if (!userRepository) {
         cache.userRepository = new UserRepository({
             loadDbInstance: () => longLivedConnection,
         });
     }
-    if (transactionsRepository) {
+    if (!transactionsRepository) {
         cache.transactionsRepository = new TransactionsRepository({
             loadDbInstance: () => longLivedConnection,
         });
